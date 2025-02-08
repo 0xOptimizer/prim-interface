@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@font-face {
+    font-family: alte;
+    src: url(../fonts/AlteHaasGroteskBold.ttf);
+}
+@font-face {
+    font-family: vice-city;
+    src: url(../fonts/GTVCS-Book.otf);
+}
+body {
+	background-color: #d4dadf;
+	font-family: 'Roboto';
+}
+p {
+	margin-bottom: 0.25rem;
+}
+.btn {
+	transition: 0.08s;
+}
+.phone-container {
+	max-width: 375px; /* Standard mobile width */
+	margin: 0 auto;
+	height: 100vh;
+	background-color: #f8f9fa;
+	padding: 20px;
+	position: relative;
+	box-shadow: 0 0 15px rgba(0,0,0,0.2);
+	overflow-y: auto;
+}
+.logo {
+	max-width: 150px;
+	margin: 40px auto;
+}
+.text-gradient-primary {
+    position: relative;
+    display: inline-block;
+    color: transparent;
+    background: linear-gradient(74deg, #93c3ff 0, #9ea9fd 9%, #d2a8a8 20%, #ff8f8f 24%, #9ea9fd 35%, #93c3ff 44%, #9ea9fd 50%, #ffc5c5 56%, #d2a8a8 75%, #ffc5c5 100%);
+    background-size: 400% 100%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: bold;
+}
+.form-floating label::after {
+	background-color: transparent !important;
+}
+.group-container {
+	--animate-duration: 0.24s;
+}
+.animate__durationExcluded {
+	--animate-duration: 1s !important;
+}
+.btn {
+	font-weight: bold;
+}
+.btn-lg {
+	/* font-family: 'vice-city'; */
+	font-size: 16px;
+	padding: 12px;
+}
