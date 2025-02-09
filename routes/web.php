@@ -22,4 +22,5 @@ Route::get('/login', [LoginController::class, 'index'])->name('login');
 Route::post('/auth/store-token', [SessionController::class, 'storeToken']);
 Route::post('/auth/logout', [SessionController::class, 'logout'])->name('logout');
 
+Route::get('/', [UserController::class, 'index'])->name('index');
 Route::get('dashboard', [UserController::class, 'index'])->name('dashboard');
