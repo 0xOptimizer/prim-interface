@@ -13,6 +13,6 @@
 @include('components.imports-cdn')
 
 <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-<link href="{{ asset('css/style.css') }}" rel="stylesheet">
+<link href="{{ asset('css/style.css') }}?v=2" rel="stylesheet">
 
 @include('components.scripts')
