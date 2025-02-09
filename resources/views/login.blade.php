@@ -86,7 +86,7 @@ $(document).ready(function() {
             success: function (response, textStatus, xhr) {
                 if (xhr.status === 200) {
                     setCookie("auth_token", response.token, 60);
-                    let messageText = "Logging in...";
+                    let messageText = "";
                     let messageIcon = "success";
 
                     $.post('/auth/store-token', { token: response.token }, function () {
