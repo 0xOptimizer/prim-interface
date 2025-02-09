@@ -23,7 +23,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
                         </svg>
                     </button> -->
-                    <h5 style="margin-top: 9px; margin-right: auto; margin-left: 12px;"><span>Welcome, <span class="text-gradient-primary">{{ $data['user']['first_name'] }}</span></span></h5>
+                    <h5 style="margin-top: 9px; margin-right: auto; margin-left: 12px;"><span>Hi, <span class="text-gradient-primary">{{ strlen($data['user']['first_name']) > 20 ? substr($data['user']['first_name'], 0, 17) . '...' : $data['user']['first_name'] }}</span></span></h5>
                     <img src="{{ $data['user']['user_image'] ?? asset('images/user/default.png') }}" alt="Profile" class="unavailable-btn rounded-circle" style="width: 40px; height: 40px;">
                 </div>
             </div>

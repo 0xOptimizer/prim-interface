@@ -8,7 +8,7 @@
     src: url(../fonts/GTVCS-Book.otf);
 }
 body {
-	background-color: #d4dadf;
+	background-color: #d0deeb;
 	font-family: 'Roboto';
 }
 p {
@@ -18,13 +18,13 @@ p {
 	transition: 0.08s;
 }
 .phone-container {
-	max-width: 375px; /* Standard mobile width */
+	min-width: 375px; /* Standard mobile width */
+	max-width: 540px; /* Standard mobile width */
 	margin: 0 auto;
 	height: 100vh;
 	background-color: #f8f9fa;
 	padding: 20px;
 	position: relative;
-	box-shadow: 0 0 15px rgba(0,0,0,0.2);
 	overflow-y: auto;
 }
 .logo {
