@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Log;
-use Laracasts\Utilities\JavaScript\JavaScriptFacade;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Exception;
 
