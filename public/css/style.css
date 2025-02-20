@@ -32,7 +32,8 @@ p {
     position: relative;
     display: inline-block;
     color: transparent;
-    background: linear-gradient(74deg, #93c3ff 0, #9ea9fd 9%, #d2a8a8 20%, #ff8f8f 24%, #9ea9fd 35%, #93c3ff 44%, #9ea9fd 50%, #ffc5c5 56%, #d2a8a8 75%, #ffc5c5 100%);
+    /* background: linear-gradient(74deg, #93c3ff 0, #9ea9fd 9%, #d2a8a8 20%, #ff8f8f 24%, #9ea9fd 35%, #93c3ff 44%, #9ea9fd 50%, #ffc5c5 56%, #d2a8a8 75%, #ffc5c5 100%); */
+	background: linear-gradient(74deg, #6d91be 0, #7a83c5 9%, #f48d8d 20%, #ff8f8f 24%, #7a83c5 35%, #6d91be 44%, #7a83c5 50%, #ffc5c5 56%, #f48d8d 75%, #ffc5c5 100%);
     background-size: 400% 100%;
     background-clip: text;
     -webkit-background-clip: text;
@@ -73,4 +74,102 @@ span.ripple {
 		transform: scale(4);
 		opacity: 0;
 	}
+}
+
+.card {
+	position: relative;
+	margin-bottom: 0.25rem;
+	overflow: hidden;
+}
+
+.card b.card-title {
+	font-size: 14px;
+}
+.card-success-bg {
+	background: rgb(255,249,175);
+	background: -moz-linear-gradient(347deg, rgba(255,249,175,0) 0%, rgba(171,209,159,0.27494747899159666) 60%, rgba(143,255,160,0.3981967787114846) 91%);
+	background: -webkit-linear-gradient(347deg, rgba(255,249,175,0) 0%, rgba(171,209,159,0.27494747899159666) 60%, rgba(143,255,160,0.3981967787114846) 91%);
+	background: linear-gradient(347deg, rgba(255,249,175,0) 0%, rgba(171,209,159,0.27494747899159666) 60%, rgba(143,255,160,0.3981967787114846) 91%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#fff9af",endColorstr="#8fffa0",GradientType=1);
+}
+
+.card-purple-bg {
+	background: rgb(83,48,69);
+	background: -moz-linear-gradient(347deg, rgba(83,48,69,0) 0%, rgba(200,54,192,0.16010154061624648) 60%, rgba(214,45,190,0.3757878151260504) 91%);
+	background: -webkit-linear-gradient(347deg, rgba(83,48,69,0) 0%, rgba(200,54,192,0.16010154061624648) 60%, rgba(214,45,190,0.3757878151260504) 91%);
+	background: linear-gradient(347deg, rgba(83,48,69,0) 0%, rgba(200,54,192,0.16010154061624648) 60%, rgba(214,45,190,0.3757878151260504) 91%);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#533045",endColorstr="#d62dbe",GradientType=1);
+}
+
+.card .card-icon {
+	position: absolute;
+    top: 17px;
+    right: -17px;
+    width: 64px;
+    height: 64px;
+    opacity: 0.12;
+    color: #198754;
+}
+
+.card .card-value {
+	position: absolute;
+    top: 19px;
+    right: 28px;
+    font-size: 39px;
+}
+
+.rooms-card-btn b.card-title {
+	font-size: 20px;
+}
+
+.rooms-card-btn .card-icon {
+	position: absolute;
+    top: 8px;
+    right: 0px;
+    width: 72px;
+    height: 72px;
+    opacity: 0.12;
+    color: #198754;
+}
+
+.room-code-input {
+	width: 64px;
+	height: 64px;
+	font-size: 32px;
+	text-align: center;
+	-moz-appearance: textfield;
+}
+
+input.room-code-input::-webkit-outer-spin-button,
+input.room-code-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.speech-recognition-container {
+	position: relative;
+	width: 225px;
+	height: 225px;
+	transition: 0.3s;
+}
+
+.speech-recognition-btn {
+	position: relative;
+	border-radius: 50%;
+	width: 100%;
+	height: 100%;
+}
+
+.speech-recognition-btn i {
+	position: absolute;
+	top: 64px;
+	right: 128px;
+}
+
+.speech-recognition-container .speech-recognition-inactive {
+	background-color: rgba(0, 0, 0, 0.08);
+}
+
+.speech-recognition-container .speech-recognition-active {
+	background-color: rgba(163, 212, 223, 0.16);
 }
