@@ -4,10 +4,6 @@
 <head>
     @include('components.header')
 </head>
-<style>
-
-
-</style>
 <body>
     <div class="phone-container">
         <div class="group-container animate__animated animate__fadeInDown animate__durationExcluded" data-group="main">
