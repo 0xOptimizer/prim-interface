@@ -94,7 +94,7 @@
                 <div class="expansion-group justify-content-around gap-2 mb-2" data-expansion="speech_to_code" style="display: none;">
                     <div class="speech-recognition-container text-center">
                         <div>
-                            <h6>Hey, start speaking!</h6>
+                            <h6 class="speech-recognition-title-text">Hey, start speaking!</h6>
                         </div>
                         <div class="speech-recognition-btn speech-recognition-inactive text-muted mt-5">
                             <i class="bi bi-mic-fill" style="font-size: 72px;"></i>
@@ -256,23 +256,89 @@ $(document).ready(function() {
             $($this).find('p').removeClass('mt-3');
         }, 550);
     });
-    $('.speech-recognition-btn').on('click', function() {
+
+    let mediaRecorder;
+    let audioChunks = [];
+    let silenceTimeout;
+    
+    $('.speech-recognition-btn').on('click', async function () {
         const $this = $(this);
         const $status = $('.speech-recognition-status-text');
         const $output = $('.speech-recognition-output code');
 
         if ($this.hasClass('speech-recognition-inactive')) {
-            $this.removeClass('speech-recognition-inactive').addClass('speech-recognition-active');
-            $this.removeClass('text-muted').addClass('text-primary');
+            audioChunks = []; // Clear previous recordings
+            $this.removeClass('speech-recognition-inactive text-muted')
+                .addClass('speech-recognition-active text-primary');
             $status.text('LISTENING');
             $output.html('<span class="text-muted">Listening...</span>');
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.start();
+
+                mediaRecorder.ondataavailable = function (event) {
+                    if (event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                    resetSilenceTimeout();
+                };
+
+                mediaRecorder.onstop = function () {
+                    processAudio();
+                };
+
+            } catch (error) {
+                console.error("Microphone access error:", error);
+                $output.html('<span class="text-danger">Microphone access denied.</span>');
+            }
         } else {
-            $this.removeClass('speech-recognition-active').addClass('speech-recognition-inactive');
-            $this.removeClass('text-primary').addClass('text-muted');
-            $status.text('NOT LISTENING');
-            $output.html('<span class="text-muted">Your code will appear here...</span>');
+            stopRecording();
         }
     });
+
+    function resetSilenceTimeout() {
+        clearTimeout(silenceTimeout);
+        silenceTimeout = setTimeout(stopRecording, 5000);
+    }
+
+    function stopRecording() {
+        if (mediaRecorder && mediaRecorder.state !== "inactive") {
+            mediaRecorder.stop();
+        }
+
+        $('.speech-recognition-btn').removeClass('speech-recognition-active text-primary')
+            .addClass('speech-recognition-inactive text-muted');
+        $('.speech-recognition-status-text').text('NOT LISTENING');
+    }
+
+    function processAudio() {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+        const reader = new FileReader();
+
+        reader.onloadend = function () {
+            const base64Audio = reader.result.split(',')[1];
+            $('.speech-recognition-output code').text(base64Audio);
+            console.log("Raw Audio Data (Base64):", base64Audio);
+
+            // $.ajax({
+            //     url: "YOUR_AWS_API_GATEWAY_ENDPOINT",
+            //     type: "POST",
+            //     contentType: "application/json",
+            //     data: JSON.stringify({ audio: base64Audio }),
+            //     success: function (response) {
+            //         console.log("AWS Response:", response);
+            //     },
+            //     error: function (xhr, status, error) {
+            //         console.error("AWS Error:", error);
+            //     }
+            // });
+        };
+
+        reader.readAsDataURL(audioBlob);
+    }
+
     $('.back-to-main-btn').on('click', function() {
         $(this).prop('disabled', true);
         $(this).html('<i class="spinner-border spinner-border-sm"></i>');
