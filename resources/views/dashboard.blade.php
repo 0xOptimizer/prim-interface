@@ -369,9 +369,14 @@ $(document).ready(function() {
         clearTimeout(silenceTimeout);
 
         let newText = '';
-        for (let i = 0; i < event.results.length; i++) {
+        let lastProcessed = finalTranscript.trim(); 
+
+        for (let i = event.resultIndex; i < event.results.length; i++) {
             if (event.results[i].isFinal) {
-                newText += event.results[i][0].transcript + ' ';
+                let transcript = event.results[i][0].transcript.trim();
+                if (!lastProcessed.endsWith(transcript)) { 
+                    newText += transcript + ' ';
+                }
             }
         }
 
@@ -379,12 +384,11 @@ $(document).ready(function() {
             finalTranscript += newText;
         }
 
-        // Highlight detected pseudocode keywords
         const pseudocodeKeywords = /\b(if|else|elseif|while|for|do|until|repeat|switch|case|default|break|function|procedure|return|print|input|output|declare|set|assign|begin|end)\b/gi;
-        const highlightedText = newText.replace(pseudocodeKeywords, '<span class="text-warning">$&</span>');
+        const highlightedText = finalTranscript.replace(pseudocodeKeywords, '<span class="text-warning">$&</span>');
 
-        $('.speech-recognition-output code').append(' ' + highlightedText);
-        
+        $('.speech-recognition-output code').html(highlightedText);
+
         console.log("Preprocessed Speech Data:", newText);
 
         silenceTimeout = setTimeout(stopRecognition, 5000);
