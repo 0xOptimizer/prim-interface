@@ -368,7 +368,7 @@ $(document).ready(function() {
     recognition.onresult = function (event) {
         clearTimeout(silenceTimeout);
 
-        let newText = ''; // Store only the new final text
+        let newText = '';
         for (let i = 0; i < event.results.length; i++) {
             if (event.results[i].isFinal) {
                 newText += event.results[i][0].transcript + ' ';
@@ -376,15 +376,20 @@ $(document).ready(function() {
         }
 
         if (newText.trim() !== '') {
-            finalTranscript += newText; // Append only finalized speech
+            finalTranscript += newText;
         }
 
-        $('.speech-recognition-output code').text(newText);
-        console.log("Preprocessed Speech Data:", newText); // Log new speech data only
+        // Highlight detected pseudocode keywords
+        const pseudocodeKeywords = /\b(if|else|elseif|while|for|do|until|repeat|switch|case|default|break|function|procedure|return|print|input|output|declare|set|assign|begin|end)\b/gi;
+        const highlightedText = newText.replace(pseudocodeKeywords, '<span class="text-warning">$&</span>');
 
-        // Reset silence timeout, waiting 5 seconds before stopping
+        $('.speech-recognition-output code').append(' ' + highlightedText);
+        
+        console.log("Preprocessed Speech Data:", newText);
+
         silenceTimeout = setTimeout(stopRecognition, 5000);
     };
+
 
     function stopRecognition() {
         recognition.stop();
