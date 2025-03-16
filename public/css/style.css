@@ -46,6 +46,9 @@ p {
 .group-container {
 	--animate-duration: 0.24s;
 }
+.group-container > div {
+	margin: 0 auto;
+}
 .animate__durationExcluded {
 	--animate-duration: 1s !important;
 }
