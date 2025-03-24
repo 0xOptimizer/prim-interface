@@ -47,6 +47,12 @@ $(document).ready(function() {
     //     // }, 550);
     // });
 
+    let syntaxMapping = {};
+
+    $.getJSON("/files/syntax_mapping.json", function (data) {
+        syntaxMapping = data;
+    });
+
     let mediaRecorder;
     let audioChunks = [];
     let silenceTimeout;
@@ -113,14 +119,26 @@ $(document).ready(function() {
             $.ajax({
                 url: "https://9ppl2g4bp9.execute-api.ap-southeast-1.amazonaws.com/dev/prim/transcribe/start",
                 type: "POST",
-                contentType: "application/json",
+                headers: { "Content-Type": "application/json; charset=utf-8" },
                 data: JSON.stringify({ audio: base64Audio }),
                 success: function (response) {
                     console.log("AWS Response:", response);
-                    if (response.job_name) {
-                        checkTranscription(response.job_name);
+                    
+                    if (typeof response === "string") {
+                        response = JSON.parse(response);
                     }
-                },
+                    
+                    setTimeout(function() { 
+                        console.log("Parsed Response object:", response);
+                        console.log("Job name:", response.job_name);
+                
+                        if (response.job_name) {
+                            checkTranscription(response.job_name);
+                        } else {
+                            console.error("No job name found.");
+                        }
+                    }, 1000);
+                },             
                 error: function (xhr, status, error) {
                     console.error("AWS Error:", error);
                 }
@@ -135,35 +153,157 @@ $(document).ready(function() {
             url: "https://9ppl2g4bp9.execute-api.ap-southeast-1.amazonaws.com/dev/prim/transcribe/check",
             type: "POST",
             contentType: "application/json",
-            data: JSON.stringify({ job_name: jobName }),
-            success: function (response) {
-                if (response.transcript_url) {
+            data: JSON.stringify({ 
+                job_name: jobName,
+                method: 'check'
+            }),
+            success: function (response, status, xhr) {
+                if (typeof response === "string") {
+                    response = JSON.parse(response);
+                }
+
+                if (xhr.status === 200 && response.transcript_url) {
                     console.log("Transcription Completed:", response.transcript_url);
                     fetchTranscript(response.transcript_url);
-                } else {
+                } else if (xhr.status === 202) {
                     console.log("Transcription in progress...");
-                    setTimeout(() => checkTranscription(jobName), 5000);
+                    setTimeout(() => checkTranscription(jobName), 2000);
+                } else {
+                    console.error("Unexpected response:", response);
                 }
             },
             error: function (xhr, status, error) {
                 console.error("Error fetching transcription:", error);
             }
         });
-    }
+    }    
 
     function fetchTranscript(transcriptUrl) {
         $.ajax({
-            url: transcriptUrl,
-            type: "GET",
+            url: "https://9ppl2g4bp9.execute-api.ap-southeast-1.amazonaws.com/dev/prim/transcribe/check",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ 
+                transcript_url: transcriptUrl,
+                method: 'retrieve'
+            }),
             success: function (response) {
+                if (typeof response === "string") {
+                    response = JSON.parse(response);
+                }
+
                 const transcriptText = response.results.transcripts[0].transcript;
-                $('.speech-recognition-output code').text(transcriptText);
+                
+                $('.speech-recognition-output-speech').val(transcriptText);
+                convertPseudocode();
             },
             error: function (xhr, status, error) {
                 console.error("Error fetching transcript text:", error);
             }
         });
-    }    
+    }
+    
+    function convertPseudocode() {
+        const input = $('.speech-recognition-output-speech').val();
+        const language = $('.speech-recognition-output-language').val();
+
+        console.log("=== Converting Pseudocode to " + language.toUpperCase() + " ===");
+        console.log("Original Input:", input);
+    
+        let cleanedSpeech = input.toLowerCase().replace(/[^a-z0-9" ]+/g, "").trim();
+        console.log("Cleaned Speech:", cleanedSpeech);
+    
+        let words = cleanedSpeech.split(" ");
+        let outputCode = "";
+        let usedIndices = new Set();
+        let indentLevel = 0;
+        const indentSize = 4;
+    
+        Object.keys(syntaxMapping).forEach(key => {
+            syntaxMapping[key].patterns.forEach(pattern => {
+                let processedPattern = pattern.replace(/\(\?:([a-z ]+)\)\?/gi, "$1").trim();
+                let patternWords = processedPattern.toLowerCase().split(" ");
+                let params = [];
+                let extractedWords = [];
+                let inputIndex = 0;
+                let match = true;
+                let localUsedIndices = new Set();
+    
+                for (let i = 0; i < patternWords.length; i++) {
+                    let word = patternWords[i];
+                    
+                    if (word.match(/\{\d+\}/)) {
+                        while (inputIndex < words.length && 
+                              (usedIndices.has(inputIndex) || localUsedIndices.has(inputIndex))) {
+                            inputIndex++;
+                        }
+                        if (inputIndex < words.length) {
+                            params.push(words[inputIndex]);
+                            extractedWords.push(words[inputIndex]);
+                            localUsedIndices.add(inputIndex);
+                            inputIndex++;
+                        } else {
+                            match = false;
+                            break;
+                        }
+                    } else {
+                        while (inputIndex < words.length && 
+                              (usedIndices.has(inputIndex) || 
+                               localUsedIndices.has(inputIndex) || 
+                               words[inputIndex] !== word)) {
+                            inputIndex++;
+                        }
+                        if (inputIndex >= words.length) {
+                            match = false;
+                            break;
+                        }
+                        extractedWords.push(words[inputIndex]);
+                        localUsedIndices.add(inputIndex);
+                        inputIndex++;
+                    }
+                }
+    
+                if (match && syntaxMapping[key].languages[language]) {
+                    localUsedIndices.forEach(index => usedIndices.add(index));
+                    let code = syntaxMapping[key].languages[language];
+                    params.forEach((param, index) => {
+                        code = code.replace(`{${index + 1}}`, param);
+                    });
+    
+                    // Add indentation
+                    const indent = ' '.repeat(indentLevel * indentSize);
+                    let codeLine = indent + code;
+    
+                    // Handle closing braces and new lines
+                    if (syntaxMapping[key].requires_closing_brace) {
+                        switch(language) {
+                            case 'python':
+                                codeLine += ':';
+                                outputCode += codeLine + '\n';
+                                indentLevel++;
+                                break;
+                            case 'javascript':
+                            case 'java':
+                                outputCode += codeLine + '\n';
+                                outputCode += indent + '}\n';
+                                break;
+                        }
+                    } else {
+                        outputCode += codeLine + '\n';
+                    }
+    
+                    // Handle indentation for created new lines
+                    if (syntaxMapping[key].creates_new_line && !syntaxMapping[key].requires_closing_brace) {
+                        outputCode += '\n';
+                    }
+                }
+            });
+        });
+    
+        console.log("\nFinal Generated Code:\n" + outputCode);
+        $('.speech-recognition-output-code pre').html(outputCode);
+        return true;
+    }
 
     // const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     // recognition.continuous = true;
@@ -254,5 +394,9 @@ $(document).ready(function() {
     $('.rooms-join-btn').on('click', function() {
         $('.rooms-menu-container').removeClass('d-flex').hide();
         $('.rooms-join-container').show();
+    });
+
+    $('.speech-recognition-output-language').on('change', function() {
+        convertPseudocode();
     });
 });

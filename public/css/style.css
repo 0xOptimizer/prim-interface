@@ -151,16 +151,15 @@ input.room-code-input::-webkit-inner-spin-button {
 
 .speech-recognition-container {
 	position: relative;
-	width: 225px;
-	height: 225px;
 	transition: 0.3s;
 }
 
 .speech-recognition-btn {
 	position: relative;
+	margin: 0 auto;
 	border-radius: 50%;
-	width: 100%;
-	height: 100%;
+	width: 225px;
+	height: 225px;
 }
 
 .speech-recognition-btn i {

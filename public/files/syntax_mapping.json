@@ -1,0 +1,48 @@
+{
+    "define_function": {
+        "patterns": [
+            "Define a function {1}",
+            "Create a function {1}",
+            "Make a function {1}"
+        ],
+        "languages": {
+            "python": "def {1}:",
+            "javascript": "function {1} {",
+            "java": "public static void {1} {"
+        },
+        "creates_new_line": true,
+        "requires_closing_brace": true
+    },
+    "return_value": {
+        "patterns": ["Return {1}"],
+        "languages": {
+            "python": "return {1}",
+            "javascript": "return {1};",
+            "java": "return {1};"
+        },
+        "creates_new_line": true
+    },
+    "variable_declaration": {
+        "patterns": [
+            "Define a variable {1} with a value of {2}",
+            "Create a variable {1} with a value of {2}",
+            "Make a variable {1} with a value of {2}"
+        ],
+        "languages": {
+            "python": "{1} = {2}",
+            "javascript": "let {1} = {2};",
+            "java": "{1} = {2};"
+        },
+        "creates_new_line": true
+    },
+    "if_statement": {
+        "patterns": ["If condition {1}"],
+        "languages": {
+            "python": "if {1}:",
+            "javascript": "if ({1}) {",
+            "java": "if ({1}) {"
+        },
+        "creates_new_line": true,
+        "requires_closing_brace": true
+    }
+}  
