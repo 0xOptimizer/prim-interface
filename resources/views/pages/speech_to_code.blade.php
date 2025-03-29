@@ -13,7 +13,7 @@
         <div class="form-floating mb-3">
             <select class="speech-recognition-output-language form-select" id="programmingLanguageSelect" aria-label="Floating label select example">
                 <option value="python">Python</option>
-                <option value="javascript">JavaScript</option>
+                <!-- <option value="javascript">JavaScript</option> -->
                 <option value="java">Java</option>
             </select>
             <label for="programmingLanguageSelect">Language</label>

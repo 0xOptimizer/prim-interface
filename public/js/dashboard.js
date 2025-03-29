@@ -287,7 +287,7 @@ $(document).ready(function() {
         console.log("\nFinal Generated Code:\n" + outputCode);
         $('.speech-recognition-output-code').html(outputCode);
         return true;
-    }    
+    }
 
     // const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     // recognition.continuous = true;
