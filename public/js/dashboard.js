@@ -61,30 +61,31 @@ $(document).ready(function() {
         const $this = $(this);
         const $status = $('.speech-recognition-status-text');
         const $output = $('.speech-recognition-output code');
-
+    
         if ($this.hasClass('speech-recognition-inactive')) {
-            audioChunks = []; // Clear previous recordings
+            audioChunks = [];
             $this.removeClass('speech-recognition-inactive text-muted')
                 .addClass('speech-recognition-active text-primary');
-            $status.text('LISTENING');
+            $status.html('<span class="pulse-animation">LISTENING</span>');
             $output.html('<span class="text-muted">Listening...</span>');
-
+    
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 mediaRecorder = new MediaRecorder(stream);
                 mediaRecorder.start();
-
+    
                 mediaRecorder.ondataavailable = function (event) {
                     if (event.data.size > 0) {
                         audioChunks.push(event.data);
+                        pulseEffect(); 
                     }
                     resetSilenceTimeout();
                 };
-
+    
                 mediaRecorder.onstop = function () {
                     processAudio();
                 };
-
+    
             } catch (error) {
                 console.error("Microphone access error:", error);
                 $output.html('<span class="text-danger">Microphone access denied.</span>');
@@ -93,6 +94,13 @@ $(document).ready(function() {
             stopRecording();
         }
     });
+    
+    function pulseEffect() {
+        $('.speech-recognition-status-text').addClass('pulse-effect');
+        setTimeout(() => {
+            $('.speech-recognition-status-text').removeClass('pulse-effect');
+        }, 500);
+    }
 
     function resetSilenceTimeout() {
         clearTimeout(silenceTimeout);
@@ -112,6 +120,8 @@ $(document).ready(function() {
     function processAudio() {
         const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
         const reader = new FileReader();
+        
+        $('.speech-recognition-output code').html('<div class="spinner-border text-primary" role="status"></div>');
     
         reader.onloadend = function () {
             const base64Audio = reader.result.split(',')[1];
@@ -129,9 +139,6 @@ $(document).ready(function() {
                     }
                     
                     setTimeout(function() { 
-                        console.log("Parsed Response object:", response);
-                        console.log("Job name:", response.job_name);
-                
                         if (response.job_name) {
                             checkTranscription(response.job_name);
                         } else {
@@ -141,6 +148,7 @@ $(document).ready(function() {
                 },             
                 error: function (xhr, status, error) {
                     console.error("AWS Error:", error);
+                    $('.speech-recognition-output code').html('<span class="text-danger">Error processing audio.</span>');
                 }
             });
         };
@@ -289,87 +297,57 @@ $(document).ready(function() {
         return true;
     }
 
-    // const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    // recognition.continuous = true;
-    // recognition.interimResults = true;
-    // recognition.lang = 'en-US';
+    let activationPhrase = localStorage.getItem('activationPhrase') || 'okay';
 
-    // let finalTranscript = '';
-    // let silenceTimeout;
+    function loadSettings() {
+        $('#activationPhrase').val(activationPhrase);
+    }
 
-    // $('.speech-recognition-btn').on('click', function () {
-    //     const $this = $(this);
-    //     const $status = $('.speech-recognition-status-text');
-    //     const $output = $('.speech-recognition-output code');
+    function saveSettings() {
+        activationPhrase = $('#activationPhrase').val().trim().toLowerCase();
+        localStorage.setItem('activationPhrase', activationPhrase);
+    }
 
-    //     if ($this.hasClass('speech-recognition-inactive')) {
-    //         finalTranscript = ''; 
-    //         $this.removeClass('speech-recognition-inactive text-muted')
-    //             .addClass('speech-recognition-active text-primary');
-    //         $status.text('LISTENING');
-    //         $output.html('<span class="text-muted">Listening...</span>');
+    $('.save-settings-btn').on('click', function () {
+        const $this = $(this);
+        $this.prop('disabled', true);
+        const originalText = $this.text();
+        $this.html('<i class="spinner-border spinner-border-sm"></i>');
 
-    //         recognition.start();
-    //     } else {
-    //         stopRecognition();
-    //     }
-    // });
+        setTimeout(() => {
+            $this.prop('disabled', false);
+            $this.text(originalText);
+            saveSettings();
+        }, 750);
+    });
 
-    // recognition.onresult = function (event) {
-    //     clearTimeout(silenceTimeout);
+    loadSettings();
 
-    //     let newText = '';
-    //     let lastProcessed = finalTranscript.trim(); 
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-US';
 
-    //     for (let i = event.resultIndex; i < event.results.length; i++) {
-    //         if (event.results[i].isFinal) {
-    //             let transcript = event.results[i][0].transcript.trim();
-    //             if (!lastProcessed.endsWith(transcript)) { 
-    //                 newText += transcript + ' ';
-    //             }
-    //         }
-    //     }
+    recognition.start();
 
-    //     if (newText.trim() !== '') {
-    //         finalTranscript += newText;
-    //     }
+    recognition.onresult = function (event) {
+        let transcript = "";
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            if (event.results[i].isFinal) {
+                transcript = event.results[i][0].transcript.trim().toLowerCase();
+            }
+        }
 
-    //     const pseudocodeKeywords = /\b(if|else|elseif|while|for|do|until|repeat|switch|case|default|break|function|procedure|return|print|input|output|declare|set|assign|begin|end)\b/gi;
-    //     const highlightedText = finalTranscript.replace(pseudocodeKeywords, '<span class="text-warning">$&</span>');
+        console.log("transcript:", transcript);
 
-    //     $('.speech-recognition-output code').html(highlightedText);
+        if (transcript.includes(activationPhrase)) {
+            $('.speech-recognition-btn').trigger('click');
+        }
+    };
 
-    //     console.log("Preprocessed Speech Data:", newText);
-
-    //     silenceTimeout = setTimeout(stopRecognition, 5000);
-    // };
-
-
-    // function stopRecognition() {
-    //     recognition.stop();
-    //     $('.speech-recognition-btn').removeClass('speech-recognition-active text-primary')
-    //         .addClass('speech-recognition-inactive text-muted');
-    //     $('.speech-recognition-status-text').text('NOT LISTENING');
-
-    //     console.log("Final Compiled Preprocessed Data:", finalTranscript);
-
-    //     // $.ajax({
-    //     //     url: "YOUR_AWS_API_GATEWAY_ENDPOINT",
-    //     //     type: "POST",
-    //     //     contentType: "application/json",
-    //     //     data: JSON.stringify({ text: finalTranscript }),
-    //     //     success: function (response) {
-    //     //         console.log("AWS Transcribe Response:", response);
-    //     //     },
-    //     //     error: function (xhr, status, error) {
-    //     //         console.error("AWS Transcribe Error:", error);
-    //     //     }
-    //     // });
-    // }
-
-    // recognition.onerror = function () {
-    //     $('.speech-recognition-output code').html('<span class="text-danger">Speech recognition error.</span>');
-    // };
+    recognition.onend = function () {
+        setTimeout(() => recognition.start(), 500);
+    };
 
     // $('.back-to-main-btn').on('click', function() {
     //     $(this).prop('disabled', true);

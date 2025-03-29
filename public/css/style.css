@@ -182,3 +182,25 @@ input.room-code-input::-webkit-inner-spin-button {
 	border: 1px solid rgba(255, 101, 101, 1);
 	background-color: rgba(255, 190, 190, 1);
 }
+
+@keyframes pulse {
+    0% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.1); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.pulse-animation {
+    display: inline-block;
+    animation: pulse 1s infinite;
+}
+
+.pulse-effect {
+    animation: pulse 0.5s ease-in-out;
+}
+
+.spinner-border {
+    width: 2rem;
+    height: 2rem;
+    display: inline-block;
+    margin: 10px auto;
+}

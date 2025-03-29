@@ -14,7 +14,32 @@
                     </svg>
                 </button>
                 <h5 style="margin-top: 9px; margin-right: auto; margin-left: 12px;"><span>Hi, <span class="text-gradient-primary">{{ strlen($data['user']['first_name']) > 20 ? substr($data['user']['first_name'], 0, 17) . '...' : $data['user']['first_name'] }}</span></span></h5>
-                <img src="{{ $data['user']['user_image'] ?? asset('images/user/default.png') }}" alt="Profile" class="unavailable-btn rounded-circle" style="width: 40px; height: 40px;">
+                <div class="dropdown">
+                    <button class="btn dropdown-toggle p-0 border-0" type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="background: none;">
+                        <img src="{{ $data['user']['user_image'] ?? asset('images/user/default.png') }}" alt="Profile" class="rounded-circle" style="width: 40px; height: 40px;">
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
+                        <li>
+                            <a class="dropdown-item" href="#">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-person me-2" viewBox="0 0 16 16" style="width: 16px; height: 16px;">
+                                    <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 1a5.978 5.978 0 0 0-4.546 2.086C3.02 11.57 3 12.28 3 12.5c0 .276.224.5.5.5h9a.5.5 0 0 0 .5-.5c0-.22-.02-.93-.454-1.414A5.978 5.978 0 0 0 8 9z"/>
+                                </svg>
+                                Account
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a href="{{ route('logout') }}" class="dropdown-item text-danger">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-box-arrow-right me-2" viewBox="0 0 16 16" style="width: 16px; height: 16px;">
+                                    <path fill-rule="evenodd" d="M6.146 11.354a.5.5 0 0 1 0-.708L9.293 8 6.146 4.854a.5.5 0 1 1 .708-.708l3.5 3.5a.5.5 0 0 1 0 .708l-3.5 3.5a.5.5 0 0 1-.708 0z"/>
+                                    <path fill-rule="evenodd" d="M4.5 8a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5z"/>
+                                    <path fill-rule="evenodd" d="M13.5 15a.5.5 0 0 1-.5-.5V1.5a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5z"/>
+                                </svg>
+                                Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
         <!-- Include the pages here -->

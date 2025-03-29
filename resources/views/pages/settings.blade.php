@@ -32,7 +32,7 @@
             </div>
         </div>
         <div class="mt-3">
-            <button type="submit" class="btn btn-primary btn-lg w-100">Save Changes</button>
+            <button type="submit" class="save-settings-btn btn btn-primary btn-lg w-100">Save Changes</button>
         </div>
     </div>
 </div>
