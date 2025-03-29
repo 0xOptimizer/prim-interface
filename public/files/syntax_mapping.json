@@ -44,5 +44,20 @@
         },
         "creates_new_line": true,
         "requires_closing_brace": true
+    },
+    "close_brace": {
+        "patterns": [
+            "Close brace",
+            "End block",
+            "End statement",
+            "Close bracket"
+        ],
+        "languages": {
+            "python": "",
+            "javascript": "}",
+            "java": "}"
+        },
+        "creates_new_line": true,
+        "requires_closing_brace": true
     }
 }  

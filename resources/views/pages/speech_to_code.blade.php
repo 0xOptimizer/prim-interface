@@ -19,8 +19,6 @@
             <label for="programmingLanguageSelect">Language</label>
         </div>
         <div class="speech-recognition-output-code">
-            <pre>
-            </pre>
         </div>
     </div>
 </div>

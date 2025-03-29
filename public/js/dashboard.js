@@ -206,7 +206,7 @@ $(document).ready(function() {
     function convertPseudocode() {
         const input = $('.speech-recognition-output-speech').val();
         const language = $('.speech-recognition-output-language').val();
-
+    
         console.log("=== Converting Pseudocode to " + language.toUpperCase() + " ===");
         console.log("Original Input:", input);
     
@@ -217,93 +217,77 @@ $(document).ready(function() {
         let outputCode = "";
         let usedIndices = new Set();
         let indentLevel = 0;
-        const indentSize = 4;
+        const indentSize = 20;
     
-        Object.keys(syntaxMapping).forEach(key => {
-            syntaxMapping[key].patterns.forEach(pattern => {
-                let processedPattern = pattern.replace(/\(\?:([a-z ]+)\)\?/gi, "$1").trim();
-                let patternWords = processedPattern.toLowerCase().split(" ");
-                let params = [];
-                let extractedWords = [];
-                let inputIndex = 0;
-                let match = true;
-                let localUsedIndices = new Set();
+        for (let i = 0; i < words.length; i++) {
+            if (usedIndices.has(i)) continue; 
     
-                for (let i = 0; i < patternWords.length; i++) {
-                    let word = patternWords[i];
-                    
-                    if (word.match(/\{\d+\}/)) {
-                        while (inputIndex < words.length && 
-                              (usedIndices.has(inputIndex) || localUsedIndices.has(inputIndex))) {
-                            inputIndex++;
-                        }
-                        if (inputIndex < words.length) {
-                            params.push(words[inputIndex]);
+            Object.keys(syntaxMapping).forEach(key => {
+                syntaxMapping[key].patterns.forEach(pattern => {
+                    let processedPattern = pattern.replace(/\(\?:([a-z ]+)\)\?/gi, "$1").trim();
+                    let patternWords = processedPattern.toLowerCase().split(" ");
+                    let params = [];
+                    let extractedWords = [];
+                    let inputIndex = i;
+                    let match = true;
+                    let localUsedIndices = new Set();
+    
+                    for (let j = 0; j < patternWords.length; j++) {
+                        let word = patternWords[j];
+    
+                        if (word.match(/\{\d+\}/)) {
+                            while (inputIndex < words.length && 
+                                  (usedIndices.has(inputIndex) || localUsedIndices.has(inputIndex))) {
+                                inputIndex++;
+                            }
+                            if (inputIndex < words.length) {
+                                params.push(words[inputIndex]);
+                                extractedWords.push(words[inputIndex]);
+                                localUsedIndices.add(inputIndex);
+                                inputIndex++;
+                            } else {
+                                match = false;
+                                break;
+                            }
+                        } else {
+                            while (inputIndex < words.length && 
+                                  (usedIndices.has(inputIndex) || 
+                                   localUsedIndices.has(inputIndex) || 
+                                   words[inputIndex] !== word)) {
+                                inputIndex++;
+                            }
+                            if (inputIndex >= words.length) {
+                                match = false;
+                                break;
+                            }
                             extractedWords.push(words[inputIndex]);
                             localUsedIndices.add(inputIndex);
                             inputIndex++;
-                        } else {
-                            match = false;
-                            break;
                         }
-                    } else {
-                        while (inputIndex < words.length && 
-                              (usedIndices.has(inputIndex) || 
-                               localUsedIndices.has(inputIndex) || 
-                               words[inputIndex] !== word)) {
-                            inputIndex++;
-                        }
-                        if (inputIndex >= words.length) {
-                            match = false;
-                            break;
-                        }
-                        extractedWords.push(words[inputIndex]);
-                        localUsedIndices.add(inputIndex);
-                        inputIndex++;
-                    }
-                }
-    
-                if (match && syntaxMapping[key].languages[language]) {
-                    localUsedIndices.forEach(index => usedIndices.add(index));
-                    let code = syntaxMapping[key].languages[language];
-                    params.forEach((param, index) => {
-                        code = code.replace(`{${index + 1}}`, param);
-                    });
-    
-                    // Add indentation
-                    const indent = ' '.repeat(indentLevel * indentSize);
-                    let codeLine = indent + code;
-    
-                    // Handle closing braces and new lines
-                    if (syntaxMapping[key].requires_closing_brace) {
-                        switch(language) {
-                            case 'python':
-                                codeLine += ':';
-                                outputCode += codeLine + '\n';
-                                indentLevel++;
-                                break;
-                            case 'javascript':
-                            case 'java':
-                                outputCode += codeLine + '\n';
-                                outputCode += indent + '}\n';
-                                break;
-                        }
-                    } else {
-                        outputCode += codeLine + '\n';
                     }
     
-                    // Handle indentation for created new lines
-                    if (syntaxMapping[key].creates_new_line && !syntaxMapping[key].requires_closing_brace) {
-                        outputCode += '\n';
+                    if (match && syntaxMapping[key].languages[language]) {
+                        localUsedIndices.forEach(index => usedIndices.add(index));
+                        let code = syntaxMapping[key].languages[language];
+                        params.forEach((param, index) => {
+                            code = code.replace(`{${index + 1}}`, param);
+                        });
+    
+                        let span = `<div class="prim-code-output" style="display: block; margin-left: ${indentLevel * indentSize}px;"><span>${code}</span></div>`;
+                        outputCode += span;
+    
+                        if (syntaxMapping[key].creates_new_line && !syntaxMapping[key].requires_closing_brace) {
+                            outputCode += '<br>';
+                        }
                     }
-                }
+                });
             });
-        });
+        }
     
         console.log("\nFinal Generated Code:\n" + outputCode);
-        $('.speech-recognition-output-code pre').html(outputCode);
+        $('.speech-recognition-output-code').html(outputCode);
         return true;
-    }
+    }    
 
     // const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     // recognition.continuous = true;
