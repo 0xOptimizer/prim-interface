@@ -211,91 +211,148 @@ $(document).ready(function() {
         });
     }
     
+    // function convertPseudocode() {
+    //     const input = $('.speech-recognition-output-speech').val();
+    //     const language = $('.speech-recognition-output-language').val();
+    
+    //     console.log("=== Converting Pseudocode to " + language.toUpperCase() + " ===");
+    //     console.log("Original Input:", input);
+    
+    //     let cleanedSpeech = input.toLowerCase().replace(/[^a-z0-9" ]+/g, "").trim();
+    //     console.log("Cleaned Speech:", cleanedSpeech);
+    
+    //     let words = cleanedSpeech.split(" ");
+    //     let outputCode = "";
+    //     let usedIndices = new Set();
+    //     let indentLevel = 0;
+    //     const indentSize = 20;
+    
+    //     for (let i = 0; i < words.length; i++) {
+    //         if (usedIndices.has(i)) continue; 
+    
+    //         Object.keys(syntaxMapping).forEach(key => {
+    //             syntaxMapping[key].patterns.forEach(pattern => {
+    //                 let processedPattern = pattern.replace(/\(\?:([a-z ]+)\)\?/gi, "$1").trim();
+    //                 let patternWords = processedPattern.toLowerCase().split(" ");
+    //                 let params = [];
+    //                 let extractedWords = [];
+    //                 let inputIndex = i;
+    //                 let match = true;
+    //                 let localUsedIndices = new Set();
+    
+    //                 for (let j = 0; j < patternWords.length; j++) {
+    //                     let word = patternWords[j];
+    
+    //                     if (word.match(/\{\d+\}/)) {
+    //                         while (inputIndex < words.length && 
+    //                               (usedIndices.has(inputIndex) || localUsedIndices.has(inputIndex))) {
+    //                             inputIndex++;
+    //                         }
+    //                         if (inputIndex < words.length) {
+    //                             params.push(words[inputIndex]);
+    //                             extractedWords.push(words[inputIndex]);
+    //                             localUsedIndices.add(inputIndex);
+    //                             inputIndex++;
+    //                         } else {
+    //                             match = false;
+    //                             break;
+    //                         }
+    //                     } else {
+    //                         while (inputIndex < words.length && 
+    //                               (usedIndices.has(inputIndex) || 
+    //                                localUsedIndices.has(inputIndex) || 
+    //                                words[inputIndex] !== word)) {
+    //                             inputIndex++;
+    //                         }
+    //                         if (inputIndex >= words.length) {
+    //                             match = false;
+    //                             break;
+    //                         }
+    //                         extractedWords.push(words[inputIndex]);
+    //                         localUsedIndices.add(inputIndex);
+    //                         inputIndex++;
+    //                     }
+    //                 }
+    
+    //                 if (match && syntaxMapping[key].languages[language]) {
+    //                     localUsedIndices.forEach(index => usedIndices.add(index));
+    //                     let code = syntaxMapping[key].languages[language];
+    //                     params.forEach((param, index) => {
+    //                         code = code.replace(`{${index + 1}}`, param);
+    //                     });
+    
+    //                     let span = `<div class="prim-code-output" style="display: block; margin-left: ${indentLevel * indentSize}px;"><span>${code}</span></div>`;
+    //                     outputCode += span;
+    
+    //                     if (syntaxMapping[key].creates_new_line && !syntaxMapping[key].requires_closing_brace) {
+    //                         outputCode += '<br>';
+    //                     }
+    //                 }
+    //             });
+    //         });
+    //     }
+    
+    //     console.log("\nFinal Generated Code:\n" + outputCode);
+    //     $('.speech-recognition-output-code').html(outputCode);
+    //     return true;
+    // }
+
     function convertPseudocode() {
-        const input = $('.speech-recognition-output-speech').val();
+        const speech = $('.speech-recognition-output-speech').val();
         const language = $('.speech-recognition-output-language').val();
     
-        console.log("=== Converting Pseudocode to " + language.toUpperCase() + " ===");
-        console.log("Original Input:", input);
+        const baseUrl = `${window.location.protocol}//${window.location.host}`;
+        $.ajax({
+            url: `${baseUrl}/api/v1/ai/convert/request`,
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({ speech: speech, language: language }),
+            success: function (response) {
+                if (typeof response === "string") {
+                    response = JSON.parse(response);
+                }
     
-        let cleanedSpeech = input.toLowerCase().replace(/[^a-z0-9" ]+/g, "").trim();
-        console.log("Cleaned Speech:", cleanedSpeech);
+                if (!response.codes || response.codes.length !== 3) {
+                    $('.speech-recognition-output-code').html('<div class="alert alert-danger">Invalid response received.</div>');
+                    return;
+                }
     
-        let words = cleanedSpeech.split(" ");
-        let outputCode = "";
-        let usedIndices = new Set();
-        let indentLevel = 0;
-        const indentSize = 20;
+                const codes = response.codes;
+                const downloadUrls = response.download_urls;
+                const testCases = response.test_cases;
     
-        for (let i = 0; i < words.length; i++) {
-            if (usedIndices.has(i)) continue; 
+                let tabsHtml = `<ul class="nav nav-tabs" id="codeTabs" role="tablist">`;
+                let contentHtml = `<div class="tab-content" id="codeTabContent">`;
     
-            Object.keys(syntaxMapping).forEach(key => {
-                syntaxMapping[key].patterns.forEach(pattern => {
-                    let processedPattern = pattern.replace(/\(\?:([a-z ]+)\)\?/gi, "$1").trim();
-                    let patternWords = processedPattern.toLowerCase().split(" ");
-                    let params = [];
-                    let extractedWords = [];
-                    let inputIndex = i;
-                    let match = true;
-                    let localUsedIndices = new Set();
+                codes.forEach((code, index) => {
+                    const tabId = `code${index}`;
+                    const activeClass = index === 0 ? "active" : "";
     
-                    for (let j = 0; j < patternWords.length; j++) {
-                        let word = patternWords[j];
+                    tabsHtml += `
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link ${activeClass}" id="${tabId}-tab" data-bs-toggle="tab" data-bs-target="#${tabId}" type="button" role="tab">${language} Solution ${index + 1}</button>
+                        </li>
+                    `;
     
-                        if (word.match(/\{\d+\}/)) {
-                            while (inputIndex < words.length && 
-                                  (usedIndices.has(inputIndex) || localUsedIndices.has(inputIndex))) {
-                                inputIndex++;
-                            }
-                            if (inputIndex < words.length) {
-                                params.push(words[inputIndex]);
-                                extractedWords.push(words[inputIndex]);
-                                localUsedIndices.add(inputIndex);
-                                inputIndex++;
-                            } else {
-                                match = false;
-                                break;
-                            }
-                        } else {
-                            while (inputIndex < words.length && 
-                                  (usedIndices.has(inputIndex) || 
-                                   localUsedIndices.has(inputIndex) || 
-                                   words[inputIndex] !== word)) {
-                                inputIndex++;
-                            }
-                            if (inputIndex >= words.length) {
-                                match = false;
-                                break;
-                            }
-                            extractedWords.push(words[inputIndex]);
-                            localUsedIndices.add(inputIndex);
-                            inputIndex++;
-                        }
-                    }
-    
-                    if (match && syntaxMapping[key].languages[language]) {
-                        localUsedIndices.forEach(index => usedIndices.add(index));
-                        let code = syntaxMapping[key].languages[language];
-                        params.forEach((param, index) => {
-                            code = code.replace(`{${index + 1}}`, param);
-                        });
-    
-                        let span = `<div class="prim-code-output" style="display: block; margin-left: ${indentLevel * indentSize}px;"><span>${code}</span></div>`;
-                        outputCode += span;
-    
-                        if (syntaxMapping[key].creates_new_line && !syntaxMapping[key].requires_closing_brace) {
-                            outputCode += '<br>';
-                        }
-                    }
+                    contentHtml += `
+                        <div class="tab-pane fade show ${activeClass}" id="${tabId}" role="tabpanel">
+                            <pre><code>${$('<div>').text(code).html()}</code></pre>
+                            <a href="${downloadUrls[index]}" class="btn btn-primary mt-3" download>Download Solution ${index + 1}</a>
+                        </div>
+                    `;
                 });
-            });
-        }
     
-        console.log("\nFinal Generated Code:\n" + outputCode);
-        $('.speech-recognition-output-code').html(outputCode);
-        return true;
-    }
+                tabsHtml += `</ul>`;
+                contentHtml += `</div>`;
+    
+                $('.speech-recognition-output-code').html(tabsHtml + contentHtml + `<h5 class="mt-3">Test Cases</h5><pre><code>${$('<div>').text(testCases).html()}</code></pre>`);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error converting pseudocode:", error);
+                $('.speech-recognition-output-code').html('<div class="alert alert-danger">Error processing request.</div>');
+            }
+        });
+    }    
 
     let activationPhrase = localStorage.getItem('activationPhrase') || 'okay';
 
