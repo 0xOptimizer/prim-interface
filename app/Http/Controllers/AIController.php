@@ -30,7 +30,8 @@ class AIController extends Controller
             4. The code must not contain any comments or explanations, only the code itself.
             5. The code must not include any sensitive information or credentials.
             6. The user must only provide pseudocode, and the AI must not make any assumptions or interpretations beyond the provided pseudocode.
-            7. The AI must not provide any additional information or context beyond the requested code.";
+            7. The AI must not provide any additional information or context beyond the requested code.
+            8. English-only responses are required.";
 
         $messages = [[
             "role" => "user",

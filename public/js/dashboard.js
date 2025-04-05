@@ -302,6 +302,11 @@ $(document).ready(function() {
         const language = $('.speech-recognition-output-language').val();
     
         const baseUrl = `${window.location.protocol}//${window.location.host}`;
+
+        $('.speech-recognition-output-speech').attr('disabled', true);
+        $('.speech-recognition-output-language').attr('disabled', true);
+        $('.speech-recognition-output-code').html('<div class="spinner-border text-primary" role="status"></div>');
+
         $.ajax({
             url: `${baseUrl}/api/v1/ai/convert/request`,
             type: "POST",
@@ -346,10 +351,16 @@ $(document).ready(function() {
                 contentHtml += `</div>`;
     
                 $('.speech-recognition-output-code').html(tabsHtml + contentHtml + `<h5 class="mt-3">Test Cases</h5><pre><code>${$('<div>').text(testCases).html()}</code></pre>`);
+
+                $('.speech-recognition-output-speech').attr('disabled', false);
+                $('.speech-recognition-output-language').attr('disabled', false);
             },
             error: function (xhr, status, error) {
                 console.error("Error converting pseudocode:", error);
                 $('.speech-recognition-output-code').html('<div class="alert alert-danger">Error processing request.</div>');
+
+                $('.speech-recognition-output-speech').attr('disabled', false);
+                $('.speech-recognition-output-language').attr('disabled', false);
             }
         });
     }    
@@ -415,7 +426,7 @@ $(document).ready(function() {
         $('.rooms-join-container').show();
     });
 
-    $('.speech-recognition-output-language').on('change', function() {
+    $('.speech-recognition-output-speech, .speech-recognition-output-language').on('change', function() {
         convertPseudocode();
     });
 });

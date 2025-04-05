@@ -50,5 +50,5 @@
         @include('pages.rooms_join')
     </div>
 </body>
-<script src="{{ asset('js/dashboard.js?v=1') }}"></script>
+<script src="{{ asset('js/dashboard.js?v=2') }}"></script>
 </html>
