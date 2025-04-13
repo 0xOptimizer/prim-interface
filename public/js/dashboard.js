@@ -308,7 +308,7 @@ $(document).ready(function() {
         $('.speech-recognition-output-code').html('<div class="spinner-border text-primary" role="status"></div>');
 
         $.ajax({
-            url: `${baseUrl}/api/v1/ai/convert/request`,
+            url: `https://prim-api.o513.dev/api/v1/ai/convert/request`,
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify({ speech: speech, language: language }),
