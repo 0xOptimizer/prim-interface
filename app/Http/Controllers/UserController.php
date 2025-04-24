@@ -54,6 +54,7 @@ class UserController extends Controller
             if (isset($data['user'])) {
                 Log::debug('User data found in response', ['user_id' => $data['user']['id']]);
                 $data['user'] = [
+                    'user_type' => $data['user']['user_type'],
                     'first_name' => $data['user']['first_name'],
                     'last_name' => $data['user']['last_name'],
                     'id' => $data['user']['id'],
