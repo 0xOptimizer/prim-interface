@@ -16,6 +16,7 @@
                 <h5 style="margin-top: 9px; margin-right: auto; margin-left: 12px;"><span>Hi, <span class="text-gradient-primary">{{ strlen($data['user']['first_name']) > 20 ? substr($data['user']['first_name'], 0, 17) . '...' : $data['user']['first_name'] }}</span></span></h5>
                 <div class="dropdown">
                     <button class="btn dropdown-toggle p-0 border-0" type="button" id="accountDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="background: none;">
+                        <img src="{{ $data['user']['user_image'] ?? asset('images/user/default.png') }}" alt="Profile" class="image-backdrop rounded-circle" style="width: 40px; height: 40px;">
                         <img src="{{ $data['user']['user_image'] ?? asset('images/user/default.png') }}" alt="Profile" class="rounded-circle" style="width: 40px; height: 40px;">
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="accountDropdown">
@@ -49,6 +50,8 @@
         @include('pages.rooms')
         @include('pages.rooms_join')
     </div>
+@include('offcanvas.speech.language')
+@include('offcanvas.speech.output')
 </body>
-<script src="{{ asset('js/dashboard.js?v=3') }}"></script>
+<script src="{{ asset('js/dashboard.js?v=4') }}"></script>
 </html>

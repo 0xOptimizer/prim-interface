@@ -1,0 +1,28 @@
+.speech-activated {
+    width: 50px;
+    aspect-ratio: 1;
+    display: grid;
+}
+.speech-activated::before,
+.speech-activated::after {    
+    content:"";
+    grid-area: 1/1;
+    --c:no-repeat radial-gradient(farthest-side,#eaf3f6 92%,#871b2500);
+    background: 
+    var(--c) 50%  0, 
+    var(--c) 50%  100%, 
+    var(--c) 100% 50%, 
+    var(--c) 0    50%;
+    background-size: 12px 12px;
+    animation: l12 1.5s infinite;
+}
+.speech-activated::before {
+    margin: 4px;
+    filter: hue-rotate(45deg);
+    background-size: 8px 8px;
+    animation-timing-function: linear
+}
+
+@keyframes l12 { 
+    100%{transform: rotate(.5turn)}
+}

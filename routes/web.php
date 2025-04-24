@@ -24,11 +24,3 @@ Route::get('/auth/logout', [SessionController::class, 'logout'])->name('logout')
 
 Route::get('/', [UserController::class, 'index'])->name('index');
 Route::get('dashboard', [UserController::class, 'index'])->name('dashboard');
-
-Route::get('/ai/download/{filename}', function ($filename) {
-    $path = storage_path('app/ai-code/' . $filename);
-    if (!file_exists($path)) {
-        abort(404);
-    }
-    return response()->download($path);
-})->name('ai.download');

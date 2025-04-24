@@ -56,8 +56,15 @@ $(document).ready(function() {
     let mediaRecorder;
     let audioChunks = [];
     let silenceTimeout;
+    let isSpeechProcessing = false;
     
     $('.speech-recognition-btn').on('click', async function () {
+        if (isSpeechProcessing) {
+            return;
+        }
+
+        isSpeechProcessing = true;
+
         const $this = $(this);
         const $status = $('.speech-recognition-status-text');
         const $output = $('.speech-recognition-output code');
@@ -66,6 +73,7 @@ $(document).ready(function() {
             audioChunks = [];
             $this.removeClass('speech-recognition-inactive text-muted')
                 .addClass('speech-recognition-active text-primary');
+            $('.speech-activated').show();
             $status.html('<span class="pulse-animation">LISTENING</span>');
             $output.html('<span class="text-muted">Listening...</span>');
     
@@ -114,7 +122,10 @@ $(document).ready(function() {
 
         $('.speech-recognition-btn').removeClass('speech-recognition-active text-primary')
             .addClass('speech-recognition-inactive text-muted');
-        $('.speech-recognition-status-text').text('NOT LISTENING');
+        $('.speech-activated').hide();
+        $('.speech-recognition-icon-mic').hide();
+        $('.speech-recognition-icon-processing').show();
+        $('.speech-recognition-status-text').text('');
     }
 
     function processAudio() {
@@ -147,6 +158,15 @@ $(document).ready(function() {
                     }, 1000);
                 },             
                 error: function (xhr, status, error) {
+                    isSpeechProcessing = false;
+                    $('.speech-recognition-icon-mic').show();
+                    $('.speech-recognition-icon-processing').hide();
+                    $('.speech-recognition-status-text').text('TAP TO ACTIVATE');
+                    $('.speech-recognition-btn').removeClass('speech-recognition-active text-primary')
+                        .addClass('speech-recognition-inactive text-muted');
+                    $('.speech-activated').hide(); 
+
+
                     console.error("AWS Error:", error);
                     $('.speech-recognition-output code').html('<span class="text-danger">Error processing audio.</span>');
                 }
@@ -207,6 +227,7 @@ $(document).ready(function() {
             },
             error: function (xhr, status, error) {
                 console.error("Error fetching transcript text:", error);
+                isSpeechProcessing = false;
             }
         });
     }
@@ -305,6 +326,7 @@ $(document).ready(function() {
 
         $('.speech-recognition-output-speech').attr('disabled', true);
         $('.speech-recognition-output-language').attr('disabled', true);
+        $('.speech-recognition-output-language-btn').attr('disabled', true);
         $('.speech-recognition-output-code').html('<div class="spinner-border text-primary" role="status"></div>');
 
         $.ajax({
@@ -316,54 +338,111 @@ $(document).ready(function() {
                 if (typeof response === "string") {
                     response = JSON.parse(response);
                 }
-    
+            
                 if (!response.codes || response.codes.length !== 3) {
                     $('.speech-recognition-output-code').html('<div class="alert alert-danger">Invalid response received.</div>');
                     return;
                 }
-    
+            
                 const codes = response.codes;
                 const downloadUrls = response.download_urls;
                 const testCases = response.test_cases;
-    
+                const language = response.language;
+            
                 let tabsHtml = `<ul class="nav nav-tabs" id="codeTabs" role="tablist">`;
                 let contentHtml = `<div class="tab-content" id="codeTabContent">`;
-    
+                let cardsHtml = ``;
+            
                 codes.forEach((code, index) => {
                     const tabId = `code${index}`;
                     const activeClass = index === 0 ? "active" : "";
-    
+            
                     tabsHtml += `
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link ${activeClass}" id="${tabId}-tab" data-bs-toggle="tab" data-bs-target="#${tabId}" type="button" role="tab">${language} Solution ${index + 1}</button>
+                            <button class="nav-link ${activeClass}" id="${tabId}-tab" data-bs-toggle="tab" data-bs-target="#${tabId}" type="button" role="tab"><img src="{{ asset('images/python_logo.svg') }}" class="speech-language-icon me-1" width="16" height="16"> S${index + 1}</button>
                         </li>
                     `;
-    
+            
                     contentHtml += `
                         <div class="tab-pane fade show ${activeClass}" id="${tabId}" role="tabpanel">
-                            <pre><code>${$('<div>').text(code).html()}</code></pre>
-                            <a href="${downloadUrls[index]}" class="btn btn-primary mt-3" download>Download Solution ${index + 1}</a>
+                            <pre style="margin-top: 20px; margin-bottom: 10px;"><code>${$('<div>').text(code).html()}</code></pre>
+                            <a href="${downloadUrls[index]}" download class="text-decoration-none">
+                                <div class="speech-language-select-option card card-interactable my-2">
+                                    <div class="card-body d-flex align-items-center">
+                                        <img src="/images/download.svg" width="32" height="32" class="me-4">
+                                        <div>
+                                            <span style="font-size: 16px;">Download Solution ${index + 1}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
                         </div>
                     `;
                 });
-    
+            
+                const downloadAllHtml = `
+                    <a href="${response.download_all_url}" download class="text-decoration-none">
+                        <div class="speech-language-select-option card card-interactable my-2">
+                            <div class="card-body d-flex align-items-center">
+                                <img src="images/download_all.svg" width="32" height="32" class="me-4">
+                                <div>
+                                    <span style="font-size: 16px;">Download All Solutions</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                `;
+            
                 tabsHtml += `</ul>`;
                 contentHtml += `</div>`;
-    
-                $('.speech-recognition-output-code').html(tabsHtml + contentHtml + `<h5 class="mt-3">Test Cases</h5><pre><code>${$('<div>').text(testCases).html()}</code></pre>`);
+            
+                $('.speech-recognition-output-code').html(
+                    tabsHtml + contentHtml +
+                    `<hr class="my-3">` +
+                    `<h5 class="mt-2">Test Cases</h5><pre><code>${$('<div>').text(testCases).html()}</code></pre>` +
+                    `<hr class="my-3">` +
+                    `<div class="mt-4">${cardsHtml}${downloadAllHtml}</div>`
+                );
+
+                $('#offcanvas-speech-output').offcanvas('show');
 
                 $('.speech-recognition-output-speech').attr('disabled', false);
                 $('.speech-recognition-output-language').attr('disabled', false);
-            },
+                $('.speech-recognition-output-language-btn').attr('disabled', false);
+
+                $('.speech-recognition-icon-mic').show();
+                $('.speech-recognition-icon-processing').hide();
+                $('.speech-recognition-status-text').text('TAP TO ACTIVATE');
+                $('.speech-activated').hide();
+                $('.speech-recognition-btn').removeClass('speech-recognition-active text-primary')
+                    .addClass('speech-recognition-inactive text-muted');
+                $('.speech-recognition-btn').prop('disabled', false);
+
+                isSpeechProcessing = false;
+            },            
             error: function (xhr, status, error) {
                 console.error("Error converting pseudocode:", error);
                 $('.speech-recognition-output-code').html('<div class="alert alert-danger">Error processing request.</div>');
-
+                
                 $('.speech-recognition-output-speech').attr('disabled', false);
                 $('.speech-recognition-output-language').attr('disabled', false);
+                $('.speech-recognition-output-language-btn').attr('disabled', false);
+
+                $('.speech-recognition-icon-mic').show();
+                $('.speech-recognition-icon-processing').hide();
+                $('.speech-recognition-status-text').text('TAP TO ACTIVATE');
+                $('.speech-activated').hide();
+                $('.speech-recognition-btn').removeClass('speech-recognition-active text-primary')
+                    .addClass('speech-recognition-inactive text-muted');
+                $('.speech-recognition-btn').prop('disabled', false);
+
+                isSpeechProcessing = false;
+            },
+            always: function() {
+                
             }
         });
-    }    
+    }
 
     let activationPhrase = localStorage.getItem('activationPhrase') || 'okay';
 
@@ -427,6 +506,44 @@ $(document).ready(function() {
     });
 
     $('.speech-recognition-output-speech, .speech-recognition-output-language').on('change', function() {
+        $('.speech-recognition-btn').removeClass('speech-recognition-active text-primary')
+            .addClass('speech-recognition-inactive text-muted');
+        $('.speech-activated').hide();
+        $('.speech-recognition-icon-mic').hide();
+        $('.speech-recognition-icon-processing').show();
+        $('.speech-recognition-status-text').text('');
+
         convertPseudocode();
+    });
+
+    $('.speech-language-select-option').on('click', function() {
+        const selectedLanguage = $(this).data('option');
+        $('.speech-recognition-output-language').val(selectedLanguage);
+        $('#offcanvas-speech-language').offcanvas('hide');
+        if (selectedLanguage === 'python') {
+            $('.speech-language-icon').attr('src', '/images/python_logo.svg');
+            $('.speech-language-text').text('Python');
+        } else if (selectedLanguage === 'javascript') {
+            $('.speech-language-icon').attr('src', '/images/javascript_logo.svg');
+            $('.speech-language-text').text('JavaScript');
+        }
+        convertPseudocode();
+    });
+
+    $('#offcanvas-speech-output').on('hidden.bs.offcanvas', function () {
+        // isSpeechProcessing = false;
+
+        // $('.speech-recognition-icon-mic').show();
+        // $('.speech-recognition-icon-processing').hide();
+        // $('.speech-recognition-status-text').text('TAP TO ACTIVATE');
+        // $('.speech-activated').hide();
+        // $('.speech-recognition-btn').removeClass('speech-recognition-active text-primary')
+        //     .addClass('speech-recognition-inactive text-muted');
+        // $('.speech-recognition-btn').prop('disabled', false);
+        // $('.speech-recognition-output-speech').attr('disabled', false);
+        // $('.speech-recognition-output-language').attr('disabled', false);
+        // $('.speech-recognition-output-language-btn').attr('disabled', false);
+        
+        // $('.speech-recognition-output-speech').val('');
     });
 });

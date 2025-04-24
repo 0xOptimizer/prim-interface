@@ -168,12 +168,12 @@ input.room-code-input::-webkit-inner-spin-button {
 	right: 128px;
 }
 
-.speech-recognition-container .speech-recognition-inactive {
+.speech-recognition-inactive {
 	background-color: rgba(0, 0, 0, 0.08);
 }
 
-.speech-recognition-container .speech-recognition-active {
-	background-color: rgba(163, 212, 223, 0.16);
+.speech-recognition-active {
+	background-color: #eaf3f6;
 }
 
 .prim-code-output span {
@@ -203,4 +203,29 @@ input.room-code-input::-webkit-inner-spin-button {
     height: 2rem;
     display: inline-block;
     margin: 10px auto;
+}
+
+.image-backdrop {
+	position: absolute;
+	filter: blur(12px);
+	z-index: -5;
+	object-fit: contain;
+	pointer-events: none;
+}
+
+.offcanvas .card {
+	border: 1px solid #343434;
+	background-color: rgba(245, 233, 255, 0.05);
+	/* color: rgba(231, 231, 231, 1); */
+	margin-bottom: 0.5rem;
+}
+
+.offcanvas .card-interactable {
+	transition: 0.08s;
+}
+
+.offcanvas .card-interactable:hover {
+	cursor: pointer;
+	border: 1px solid #67666f;
+	background-color: rgba(0, 0, 0, 0.33);
 }
