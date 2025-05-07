@@ -28,13 +28,21 @@
                                 Account
                             </a>
                         </li>
+                        @if ($data['user']['user_type'] === 'admin')
+                        <li>
+                            <a class="dropdown-item" href="#">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6 me-2" style="width: 16px; height: 16px;">
+                                    <path fill-rule="evenodd" d="M3 6a3 3 0 0 1 3-3h2.25a3 3 0 0 1 3 3v2.25a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3V6Zm9.75 0a3 3 0 0 1 3-3H18a3 3 0 0 1 3 3v2.25a3 3 0 0 1-3 3h-2.25a3 3 0 0 1-3-3V6ZM3 15.75a3 3 0 0 1 3-3h2.25a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3H6a3 3 0 0 1-3-3v-2.25Zm9.75 0a3 3 0 0 1 3-3H18a3 3 0 0 1 3 3V18a3 3 0 0 1-3 3h-2.25a3 3 0 0 1-3-3v-2.25Z" clip-rule="evenodd" />
+                                </svg>
+                                Admin Panel
+                            </a>
+                        </li>
+                        @endif
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <a href="{{ route('logout') }}" class="dropdown-item text-danger">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-box-arrow-right me-2" viewBox="0 0 16 16" style="width: 16px; height: 16px;">
-                                    <path fill-rule="evenodd" d="M6.146 11.354a.5.5 0 0 1 0-.708L9.293 8 6.146 4.854a.5.5 0 1 1 .708-.708l3.5 3.5a.5.5 0 0 1 0 .708l-3.5 3.5a.5.5 0 0 1-.708 0z"/>
-                                    <path fill-rule="evenodd" d="M4.5 8a.5.5 0 0 1 .5-.5h6a.5.5 0 0 1 0 1h-6a.5.5 0 0 1-.5-.5z"/>
-                                    <path fill-rule="evenodd" d="M13.5 15a.5.5 0 0 1-.5-.5V1.5a.5.5 0 0 1 1 0v13a.5.5 0 0 1-.5.5z"/>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6 me-2" style="width: 16px; height: 16px;">
+                                    <path fill-rule="evenodd" d="M7.5 3.75A1.5 1.5 0 0 0 6 5.25v13.5a1.5 1.5 0 0 0 1.5 1.5h6a1.5 1.5 0 0 0 1.5-1.5V15a.75.75 0 0 1 1.5 0v3.75a3 3 0 0 1-3 3h-6a3 3 0 0 1-3-3V5.25a3 3 0 0 1 3-3h6a3 3 0 0 1 3 3V9A.75.75 0 0 1 15 9V5.25a1.5 1.5 0 0 0-1.5-1.5h-6Zm10.72 4.72a.75.75 0 0 1 1.06 0l3 3a.75.75 0 0 1 0 1.06l-3 3a.75.75 0 1 1-1.06-1.06l1.72-1.72H9a.75.75 0 0 1 0-1.5h10.94l-1.72-1.72a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
                                 </svg>
                                 Logout
                             </a>
@@ -49,9 +57,15 @@
         @include('pages.speech_to_code')
         @include('pages.rooms')
         @include('pages.rooms_join')
+        @include('pages.rooms_create')
     </div>
 @include('offcanvas.speech.language')
 @include('offcanvas.speech.output')
 </body>
+<script>
+    window.AppData = {
+        user_uuid: "{{ $data['user']['uuid'] }}",
+    };
+</script>
 <script src="{{ asset('js/dashboard.js?v=4') }}"></script>
 </html>

@@ -3,6 +3,7 @@ $.ajaxSetup({
         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
     }
 });
+var current_room_code;
 $(document).ready(function() {
     // $('body').on('click', '.group-navigate-btn', function() {
     //     const $this = $(this);
@@ -333,7 +334,7 @@ $(document).ready(function() {
             url: `https://prim-api.o513.dev/api/v1/ai/convert/request`,
             type: "POST",
             contentType: "application/json",
-            data: JSON.stringify({ speech: speech, language: language }),
+            data: JSON.stringify({ speech: speech, language: language, room_code: current_room_code, user_uuid: window.AppData.user_uuid }),
             success: function (response) {
                 if (typeof response === "string") {
                     response = JSON.parse(response);
@@ -546,4 +547,64 @@ $(document).ready(function() {
         
         // $('.speech-recognition-output-speech').val('');
     });
+
+    $('.create-room-btn').on('click', function() {
+        const roomName = $('#room-name').val();
+
+        if (roomName === '') {
+            return;
+        }
+
+        $(this).prop('disabled', true);
+        $(this).html('<i class="spinner-border spinner-border-sm"></i>');
+
+        $.ajax({
+            url: 'https://prim-api.o513.dev/api/v1/rooms/',
+            type: 'POST',
+            data: { name: roomName },
+            contentType: "application/json",
+            success: function(response) {
+                console.log("Room created successfully:", response);
+                current_room_code = response.code;
+
+                // redirect here
+
+                $('#room-name').val('');
+                $('.create-room-btn').prop('disabled', false);
+                $('.create-room-btn').html('Create');
+            },
+            error: function(xhr, status, error) {
+                console.error("Error creating room:", error);
+                $('.create-room-btn').prop('disabled', false);
+                $('.create-room-btn').html('Error: Try Again');
+            }
+        });
+    });
+
+    function getRooms() {
+        const user_uuid = window.AppData.user_uuid;
+
+        $.ajax({
+            url: 'https://prim-api.o513.dev/api/v1/rooms/',
+            type: 'GET',
+            data: { user_uuid: user_uuid },
+            contentType: "application/json",
+            success: function(response) {
+                console.log("Rooms fetched successfully:", response);
+                const rooms = response.rooms;
+                const $roomsList = $('.rooms-list');
+                $roomsList.empty();
+
+                rooms.forEach(room => {
+                    const roomItem = `<div class="room-item" data-code="${room.code}">${room.name}</div>`;
+                    $roomsList.append(roomItem);
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching rooms:", error);
+            }
+        });
+    }
+
+    getRooms();
 });

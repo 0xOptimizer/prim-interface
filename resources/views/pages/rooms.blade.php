@@ -1,8 +1,8 @@
 <div class="group-container mb-2" data-group="rooms" style="display: none;">
-    @if ($data['user']['user_type'] === 'teacher')
+    @if ($data['user']['user_type'] === 'teacher' || $data['user']['user_type'] === 'admin')
         <div class="rooms-menu-container d-flex justify-content-around gap-2">
             <div class="w-100">
-                <div class="rooms-create-btn rooms-card-btn card card-success-bg">
+                <div class="group-navigate-btn rooms-create-btn rooms-card-btn card card-success-bg" data-group="rooms_create">
                     <div class="card-body">
                         <b class="card-title">Create a Room</b>
                     </div>
@@ -16,7 +16,8 @@
                 </div>
             </div>
         </div>
-    @elseif ($data['user']['user_type'] === 'student')
+    @endif
+    @if ($data['user']['user_type'] === 'student' || $data['user']['user_type'] === 'teacher' || $data['user']['user_type'] === 'admin')
         <div class="rooms-menu-container d-flex justify-content-around gap-2">
             <div class="w-100">
                 <div class="group-navigate-btn rooms-card-btn card card-purple-bg" data-group="rooms_join">

@@ -30,7 +30,7 @@
         </div>
     </div>
     <div class="d-flex justify-content-around gap-2 mb-2">
-        <div class="w-100">
+        <div class="w-100 rooms-list">
             <div class="card card-success-bg">
                 <div class="card-body">
                     <b class="card-title">SHS-1</b>
