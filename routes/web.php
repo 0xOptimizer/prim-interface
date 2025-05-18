@@ -24,3 +24,4 @@ Route::get('/auth/logout', [SessionController::class, 'logout'])->name('logout')
 
 Route::get('/', [UserController::class, 'index'])->name('index');
 Route::get('dashboard', [UserController::class, 'index'])->name('dashboard');
+Route::get('analytics', [UserController::class, 'analytics'])->name('analytics');
