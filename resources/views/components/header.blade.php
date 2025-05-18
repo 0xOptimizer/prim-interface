@@ -13,7 +13,7 @@
 @include('components.imports-cdn')
 
 <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-<link href="{{ asset('css/style.css') }}?v=8" rel="stylesheet">
+<link href="{{ asset('css/style.css') }}?v=9" rel="stylesheet">
 <link href="{{ asset('css/speech-activated.css') }}" rel="stylesheet">
 
 @include('components.scripts')

@@ -83,5 +83,5 @@
         user_uuid: "{{ $data['user']['uuid'] }}",
     };
 </script>
-<script src="{{ asset('js/dashboard.js?v=4') }}"></script>
+<script src="{{ asset('js/dashboard.js?v=5') }}"></script>
 </html>
