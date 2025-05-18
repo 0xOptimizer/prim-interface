@@ -4,6 +4,7 @@ $.ajaxSetup({
     }
 });
 var current_room_code;
+var current_room_uuid;
 $(document).ready(function() {
     // $('body').on('click', '.group-navigate-btn', function() {
     //     const $this = $(this);
@@ -550,6 +551,8 @@ $(document).ready(function() {
 
     $('.create-room-btn').on('click', function() {
         const roomName = $('#room-name').val();
+        const roomDescription = $('#room-description').val();
+        const user_uuid = window.AppData.user_uuid;
 
         if (roomName === '') {
             return;
@@ -559,15 +562,16 @@ $(document).ready(function() {
         $(this).html('<i class="spinner-border spinner-border-sm"></i>');
 
         $.ajax({
-            url: 'https://prim-api.o513.dev/api/v1/rooms/',
+            url: 'https://prim-api.o513.dev/api/v1/rooms/create',
             type: 'POST',
-            data: { name: roomName },
-            contentType: "application/json",
+            data: { name: roomName, description: roomDescription, user_uuid: user_uuid },
             success: function(response) {
                 console.log("Room created successfully:", response);
                 current_room_code = response.code;
+                current_room_uuid = response.uuid;
 
-                // redirect here
+                $('#view-room-code').val(current_room_code);
+                $('#offcanvas-rooms').offcanvas('show');
 
                 $('#room-name').val('');
                 $('.create-room-btn').prop('disabled', false);
@@ -585,18 +589,45 @@ $(document).ready(function() {
         const user_uuid = window.AppData.user_uuid;
 
         $.ajax({
-            url: 'https://prim-api.o513.dev/api/v1/rooms/',
-            type: 'GET',
+            url: 'https://prim-api.o513.dev/api/v1/rooms/show/all',
+            type: 'POST',
             data: { user_uuid: user_uuid },
-            contentType: "application/json",
             success: function(response) {
                 console.log("Rooms fetched successfully:", response);
-                const rooms = response.rooms;
                 const $roomsList = $('.rooms-list');
                 $roomsList.empty();
 
-                rooms.forEach(room => {
-                    const roomItem = `<div class="room-item" data-code="${room.code}">${room.name}</div>`;
+                if (response.length === 0) {
+                    // $roomsList.append('<div class="alert alert-info">No rooms available.</div>');
+                    return;
+                }
+
+                response.forEach(room => {
+                    const lastActive = new Date(room.last_active);
+                    const now = new Date();
+                    const hoursDiff = (now - lastActive) / 36e5;
+                    const isActive = hoursDiff < 24;
+                
+                    const roomItem = `
+                        <div class="room-card card ${isActive ? 'card-success-bg' : ''}" data-room_code="${room.code}" data-room_uuid="${room.uuid}" data-room_name="${room.name}">
+                            <div class="card-body">
+                                <b class="card-title">${room.name}</b>
+                                <p class="card-text text-muted" style="font-size: 10px;">
+                                    ${isActive ? `<span class="text-success"><i class="spinner-grow" style="width: 8px; height: 8px;"></i> <b>ACTIVE</b></span> • TBD` : 'TBD'}
+                                </p>
+                            </div>
+                            ${isActive ? `
+                            <div class="card-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                                    <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="card-value">
+                                <b class="text-success">${room.user_count}</b>
+                            </div>` : ''}
+                        </div>
+                    `;
+                
                     $roomsList.append(roomItem);
                 });
             },
@@ -606,5 +637,207 @@ $(document).ready(function() {
         });
     }
 
+    let is_room_open = false;
+    $('.rooms-list').on('click', '.room-card', function() {
+        const room_code = $(this).data('room_code');
+        const room_name = $(this).data('room_name');
+        current_room_code = room_code;
+        current_room_uuid = $(this).data('room_uuid');
+
+        is_room_open = true;
+        loadChats();
+        
+        $('#view-room-code').text(room_code);
+        $('#view-room-name').text(room_name);
+
+        $('#offcanvas-rooms').offcanvas('show');
+    });
+    
+    $('#offcanvas-rooms').on('hide.bs.offcanvas', function () {
+        if (is_room_open) {
+            is_room_open = false;
+        }
+    });
+
+    function setupRoomCodeInputs() {
+        $('.room-code-input:not([disabled])').on('input', function() {
+            let val = $(this).val().toUpperCase().replace(/[^A-Z0-9]/g, '');
+            if (val.length > 1) val = val.charAt(0);
+            $(this).val(val);
+
+            if (val && $(this).next('.room-code-input').length) {
+                $(this).next('.room-code-input').focus();
+            }
+        }).on('keydown', function(e) {
+            if (e.key === 'Backspace' && !$(this).val() && $(this).prev('.room-code-input').length) {
+                $(this).prev('.room-code-input').focus();
+            }
+        });
+    }
+    setupRoomCodeInputs();
+
+    $('.rooms-join-btn').on('click', function(e) {
+        e.preventDefault();
+    
+        let code = '#';
+        $('.room-code-input:not([disabled])').each(function() {
+            code += $(this).val().trim().toUpperCase();
+        });
+    
+        if (code.length !== 5) return;
+    
+        const user_uuid = window.AppData.user_uuid;
+        const $btn = $(this);
+    
+        $btn.prop('disabled', true).html('<i class="spinner-border spinner-border-sm"></i>');
+    
+        $.ajax({
+            url: 'https://prim-api.o513.dev/api/v1/rooms/join',
+            type: 'POST',
+            data: {
+                code: code,
+                user_uuid: user_uuid
+            },
+            success: function(response) {
+                current_room_code = code;
+                current_room_uuid = response.uuid;
+
+                is_room_open = true;
+                loadChats();
+                $('#view-room-name').text(response.name);
+                $('#view-room-code').text(current_room_code);
+                
+                $('#offcanvas-rooms').offcanvas('show');
+
+                $btn.prop('disabled', false).html('Join');
+            },
+            error: function(xhr, status, error) {
+                console.error("Error joining room:", error);
+                $btn.prop('disabled', false).html('Error: Try Again');
+            }
+        });
+    });
+
     getRooms();
+
+    // Calculate relative time
+    function getRelativeTime(date) {
+        const now = new Date();
+        const diff = Math.floor((now - date) / 1000);
+        if (diff < 60) return 'Just now';
+        if (diff < 3600) {
+            const mins = Math.floor(diff / 60);
+            return `${mins} min${mins !== 1 ? 's' : ''} ago`;
+        }
+        if (diff < 86400) {
+            const hrs = Math.floor(diff / 3600);
+            return `${hrs} hr${hrs !== 1 ? 's' : ''} ago`;
+        }
+        return `${Math.floor(diff / 86400)} day${Math.floor(diff / 86400) > 1 ? 's' : ''} ago`;
+    }
+
+    function loadChats(skipLoading=false) {
+        if (!current_room_uuid) return;
+        const chatBox = $('.chat-messages');
+        if (!skipLoading) {
+            chatBox.html('<div class="text-center my-3">Loading messages...</div>');
+        }
+
+        $.ajax({
+            url: 'https://prim-api.o513.dev/api/v1/rooms/chat/show',
+            type: 'POST',
+            data: { room_uuid: current_room_uuid },
+            success: function (data) {
+                chatBox.empty();
+                if (data.length === 0) {
+                    chatBox.html('<div class="text-center my-3 text-muted">No messages yet.</div>');
+                    return;
+                }
+
+                let previousMsg = null;
+
+                data.forEach((msg, index) => {
+                    const isCurrentUser = msg.user.uuid === window.AppData.user_uuid;
+                    const user = msg.user;
+                    const fullName = `${user.first_name} ${user.last_name}`;
+                    const userImg = user.user_image || 'https://prim.o513.dev/public/images/user/default.png';
+                    const createdAt = new Date(msg.created_at);
+                    const relativeTime = getRelativeTime(createdAt);
+
+                    let hideMeta = false;
+                    if (previousMsg) {
+                        const prevTime = new Date(previousMsg.created_at);
+                        const timeDiff = (createdAt - prevTime) / 1000;
+                        if (previousMsg.user.uuid === msg.user.uuid && timeDiff <= 3600) {
+                            hideMeta = true;
+                        }
+                    }
+
+                    const message = `
+                        <div class="d-flex mb-2 ${isCurrentUser ? 'justify-content-end' : ''}">
+                            ${!isCurrentUser && !hideMeta ? `<img src="${userImg}" class="rounded-circle me-2" width="40" height="40">` : `<div style="width: 40px; margin-right: 10px;"></div>`}
+                            <div style="max-width: 75%;">
+                                ${!hideMeta ? `
+                                    <div style="font-size: 12px; text-align: ${isCurrentUser ? 'right' : 'left'};">
+                                        <b class="text-gradient-primary">${user.first_name}</b>
+                                        <span style="opacity: 0.75; font-size: 11px;">&nbsp;·&nbsp;${relativeTime}</span>
+                                    </div>` : ''
+                                }
+                                <div class="mt-1 mb-1 p-2" style="font-size: 18px; background-color: ${isCurrentUser ? '#0d6efd' : '#bfbebe4a'}; border-radius: ${isCurrentUser ? '8px 0px 8px 8px' : '0px 8px 8px 8px'};${isCurrentUser ? ' color: #fff;' : ''}">
+                                    ${msg.chat}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    chatBox.append(message);
+                    previousMsg = msg;
+                });
+
+                chatBox.scrollTop(chatBox[0].scrollHeight);
+            },
+            error: function () {
+                chatBox.html('<div class="text-center my-3 text-danger">Failed to load messages.</div>');
+            }
+        });
+    }
+
+    $('#chat-form').submit(function (e) {
+        e.preventDefault();
+        const input = $('#chat-message');
+        const message = input.val().trim();
+        if (!message || !current_room_uuid) return;
+
+        const form = $(this);
+        form.find('button').prop('disabled', true);
+        form.find('button').html('<i class="spinner-border spinner-border-sm"></i>');
+
+        $.ajax({
+            url: 'https://prim-api.o513.dev/api/v1/rooms/chat/create',
+            type: 'POST',
+            headers: {
+                'Accept': 'application/json'
+            },
+            data: {
+                room_uuid: current_room_uuid,
+                user_uuid: window.AppData.user_uuid,
+                chat: message,
+                chat_type: 'conversation'
+            },
+            success: function () {
+                input.val('');
+                loadChats();
+            },
+            complete: function () {
+                form.find('button').prop('disabled', false);
+                form.find('button').html('<i class="fa-solid fa-paper-plane"></i>');
+            }
+        });
+    });
+
+    setInterval(function() {
+        if (!is_room_open) return;
+        if (!current_room_uuid) return;
+        loadChats(true);
+    }, 5000);
 });

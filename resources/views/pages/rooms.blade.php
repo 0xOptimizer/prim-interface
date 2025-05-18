@@ -35,4 +35,8 @@
             </div>
         </div>
     @endif
+    <hr class="my-4">
+    <div class="text-center mt-3 text-muted">
+        <i class="bi bi-info-circle"></i> Previous rooms will appear here.
+    </div>
 </div>
