@@ -8,139 +8,154 @@
     src: url(../fonts/GTVCS-Book.otf);
 }
 body {
-	background-color: #d0deeb;
-	font-family: 'Roboto';
+    background: linear-gradient(135deg, #eaf3f6 0%, #f8f9fa 100%);
+    color: #232526;
+    font-family: 'Roboto', 'IBM Plex Mono', monospace;
+    min-height: 100vh;
+    letter-spacing: 0.01em;
 }
 p {
 	margin-bottom: 0.25rem;
 }
 .phone-container {
-	min-width: 375px; /* Standard mobile width */
-	max-width: 540px; /* Standard mobile width */
-	margin: 0 auto;
-	height: 100vh;
-	background-color: #f8f9fa;
-	padding: 20px;
-	position: relative;
-	overflow-y: auto;
+    min-width: 375px;
+    max-width: 540px;
+    margin: 0 auto;
+    height: 100vh;
+    background: linear-gradient(135deg, #f8f9fa 0%, #eaf3f6 40%, #b2f7ef 80%, #ffd6e0 100%);
+    background-image: none;
+    background-blend-mode: initial;
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10);
+    border-radius: 24px;
+    border: 1.5px solid #e3e8ee;
+    padding: 32px 24px;
+    margin-top: 32px;
+    position: relative;
 }
 .logo {
-	max-width: 150px;
-	margin: 40px auto;
+    max-width: 150px;
+    margin: 40px auto;
+    filter: drop-shadow(0 0 12px #a3c8f688);
+    border-radius: 16px;
+    background: rgba(180, 210, 255, 0.08);
+    padding: 12px 0;
 }
 .text-gradient-primary {
     position: relative;
     display: inline-block;
     color: transparent;
-    /* background: linear-gradient(74deg, #93c3ff 0, #9ea9fd 9%, #d2a8a8 20%, #ff8f8f 24%, #9ea9fd 35%, #93c3ff 44%, #9ea9fd 50%, #ffc5c5 56%, #d2a8a8 75%, #ffc5c5 100%); */
-	background: linear-gradient(74deg, #6d91be 0, #7a83c5 9%, #f48d8d 20%, #ff8f8f 24%, #7a83c5 35%, #6d91be 44%, #7a83c5 50%, #ffc5c5 56%, #f48d8d 75%, #ffc5c5 100%);
-    background-size: 400% 100%;
-    background-clip: text;
+    background: linear-gradient(90deg, #7a83c5 0%, #93c3ff 40%, #ffc5c5 80%, #a8e6cf 100%);
+    background-size: 200% 200%;
+    animation: gradientMove 3s ease-in-out infinite;
+    text-shadow: 0 2px 8px #fff8;
+    letter-spacing: 0.04em;
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
-    font-weight: bold;
-}
-.form-floating label::after {
-	background-color: transparent !important;
-}
-.group-container {
-	--animate-duration: 0.24s;
-}
-.group-container > div {
-	margin: 0 auto;
-}
-.animate__durationExcluded {
-	--animate-duration: 1s !important;
-}
-.btn {
-	position: relative;
-	font-weight: bold;
-	overflow: hidden;
-	transition: 0.08s;
-}
-.btn-lg {
-	/* font-family: 'vice-city'; */
-	font-size: 16px;
-	padding: 12px;
+    font-family: 'IBM Plex Mono', 'Roboto', monospace;
+    font-size: 2.1rem;
+    font-weight: 700;
 }
 
-span.ripple {
-	position: absolute;
-	border-radius: 50%;
-	transform: scale(0);
-	animation: ripple 800ms linear;
-	background-color: rgba(255, 255, 255, 0.7);
-}
-
-@keyframes ripple {
-	to {
-		transform: scale(4);
-		opacity: 0;
-	}
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
 }
 
 .card {
-	position: relative;
-	margin-bottom: 0.25rem;
-	overflow: hidden;
+    position: relative;
+    margin-bottom: 0.75rem;
+    overflow: hidden;
+    background: rgba(245, 249, 255, 0.95);
+    border-radius: 18px;
+    border: 1.5px solid #c3dafe;
+    box-shadow: 0 4px 24px 0 rgba(120, 180, 255, 0.10);
+    transition: box-shadow 0.2s, border 0.2s, background 0.2s;
+    color: #232526;
+}
+.card:hover, .offcanvas .card-interactable:hover {
+    border: 1.5px solid #a8e6cf;
+    box-shadow: 0 0 24px 0 #a8e6cf55;
+    background: rgba(245, 249, 255, 1);
 }
 
-.card b.card-title {
-	font-size: 14px;
-}
-.card-success-bg {
-	background: rgb(255,249,175);
-	background: -moz-linear-gradient(347deg, rgba(255,249,175,0) 0%, rgba(171,209,159,0.27494747899159666) 60%, rgba(143,255,160,0.3981967787114846) 91%);
-	background: -webkit-linear-gradient(347deg, rgba(255,249,175,0) 0%, rgba(171,209,159,0.27494747899159666) 60%, rgba(143,255,160,0.3981967787114846) 91%);
-	background: linear-gradient(347deg, rgba(255,249,175,0) 0%, rgba(171,209,159,0.27494747899159666) 60%, rgba(143,255,160,0.3981967787114846) 91%);
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#fff9af",endColorstr="#8fffa0",GradientType=1);
-}
-
-.card-purple-bg {
-	background: rgb(83,48,69);
-	background: -moz-linear-gradient(347deg, rgba(83,48,69,0) 0%, rgba(200,54,192,0.16010154061624648) 60%, rgba(214,45,190,0.3757878151260504) 91%);
-	background: -webkit-linear-gradient(347deg, rgba(83,48,69,0) 0%, rgba(200,54,192,0.16010154061624648) 60%, rgba(214,45,190,0.3757878151260504) 91%);
-	background: linear-gradient(347deg, rgba(83,48,69,0) 0%, rgba(200,54,192,0.16010154061624648) 60%, rgba(214,45,190,0.3757878151260504) 91%);
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#533045",endColorstr="#d62dbe",GradientType=1);
-}
-
-.card .card-icon {
-	position: absolute;
-    top: 17px;
-    right: -17px;
-    width: 64px;
-    height: 64px;
-    opacity: 0.12;
-    color: #198754;
+.card b.card-title, .rooms-card-btn b.card-title {
+    font-family: 'IBM Plex Mono', 'Roboto', monospace;
+    font-size: 18px;
+    color: #7a83c5;
+    letter-spacing: 0.03em;
 }
 
 .card .card-value {
-	position: absolute;
-    top: 19px;
-    right: 28px;
-    font-size: 39px;
+    color: #93c3ff;
+    text-shadow: 0 2px 8px #a8e6cf88;
 }
 
-.rooms-card-btn b.card-title {
-	font-size: 20px;
+.card .card-icon, .rooms-card-btn .card-icon {
+    color: #a8e6cf;
+    filter: drop-shadow(0 0 8px #a8e6cfcc);
 }
 
-.rooms-card-btn .card-icon {
-	position: absolute;
-    top: 8px;
-    right: 0px;
-    width: 72px;
-    height: 72px;
-    opacity: 0.12;
-    color: #198754;
+.btn {
+    position: relative;
+    font-weight: bold;
+    overflow: hidden;
+    background: linear-gradient(90deg, #7a83c5 0%, #a8e6cf 100%);
+    color: #232526;
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px 0 #a8e6cf55;
+    letter-spacing: 0.04em;
+    font-family: 'IBM Plex Mono', 'Roboto', monospace;
+    transition: background 0.2s, box-shadow 0.2s, color 0.2s;
+}
+.btn:hover, .btn:focus {
+    background: linear-gradient(90deg, #ffc5c5 0%, #7a83c5 100%);
+    color: #232526;
+    box-shadow: 0 0 24px 0 #ffc5c555;
+}
+
+.btn-lg {
+    font-size: 18px;
+    padding: 16px 32px;
+    border-radius: 16px;
+}
+
+span.ripple {
+    position: absolute;
+    border-radius: 50%;
+    transform: scale(0);
+    animation: ripple 800ms linear;
+    background-color: rgba(122, 131, 197, 0.18);
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
 }
 
 .room-code-input {
-	width: 64px;
-	height: 64px;
-	font-size: 32px;
-	text-align: center;
-	-moz-appearance: textfield;
+    width: 64px;
+    height: 64px;
+    font-size: 32px;
+    text-align: center;
+    appearance: textfield;
+    -moz-appearance: textfield;
+    border: 1.5px solid #c3dafe;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.7);
+    color: #7a83c5;
+    font-family: 'IBM Plex Mono', monospace;
+    box-shadow: 0 1px 8px 0 #a8e6cf22;
+    transition: border 0.2s, box-shadow 0.2s;
+}
+.room-code-input:focus {
+    border: 1.5px solid #a8e6cf;
+    box-shadow: 0 0 8px 0 #a8e6cfcc;
+    outline: none;
 }
 
 input.room-code-input::-webkit-outer-spin-button,
@@ -149,38 +164,42 @@ input.room-code-input::-webkit-inner-spin-button {
   margin: 0;
 }
 
-.speech-recognition-container {
-	position: relative;
-	transition: 0.3s;
-}
-
 .speech-recognition-btn {
-	position: relative;
-	margin: 0 auto;
-	border-radius: 50%;
-	width: 225px;
-	height: 225px;
+    position: relative;
+    margin: 0 auto;
+    border-radius: 50%;
+    width: 225px;
+    height: 225px;
+    background: linear-gradient(135deg, #eaf3f6 0%, #a8e6cf 100%);
+    box-shadow: 0 0 32px 0 #a8e6cf55;
+    border: 2px solid #7a83c5;
+    transition: box-shadow 0.2s, border 0.2s;
 }
-
 .speech-recognition-btn i {
-	position: absolute;
-	top: 64px;
-	right: 128px;
+    position: absolute;
+    top: 64px;
+    right: 128px;
+    color: #7a83c5;
+    text-shadow: 0 0 8px #a8e6cfcc;
 }
-
 .speech-recognition-inactive {
-	background-color: rgba(0, 0, 0, 0.08);
+    background-color: rgba(0, 0, 0, 0.04);
+    opacity: 0.7;
 }
-
 .speech-recognition-active {
-	background-color: #eaf3f6;
+    background-color: #f8f9fa;
+    box-shadow: 0 0 32px 0 #a8e6cfcc;
+    border: 2px solid #ffc5c5;
 }
 
 .prim-code-output span {
-	padding: 5px;
-	border-radius: 8px;
-	border: 1px solid rgba(255, 101, 101, 1);
-	background-color: rgba(255, 190, 190, 1);
+    padding: 5px;
+    border-radius: 8px;
+    border: 1.5px dashed #7a83c5;
+    background: linear-gradient(90deg, #eaf3f6 0%, #a8e6cf 100%);
+    color: #7a83c5;
+    box-shadow: 0 1px 8px 0 #a8e6cf22;
+    font-family: 'IBM Plex Mono', monospace;
 }
 
 @keyframes pulse {
@@ -192,10 +211,12 @@ input.room-code-input::-webkit-inner-spin-button {
 .pulse-animation {
     display: inline-block;
     animation: pulse 1s infinite;
+    filter: drop-shadow(0 0 8px #a8e6cfcc);
 }
 
 .pulse-effect {
     animation: pulse 0.5s ease-in-out;
+    filter: drop-shadow(0 0 8px #a8e6cfcc);
 }
 
 .spinner-border {
@@ -203,29 +224,115 @@ input.room-code-input::-webkit-inner-spin-button {
     height: 2rem;
     display: inline-block;
     margin: 10px auto;
+    border: 3px solid #c3dafe;
+    border-top: 3px solid #a8e6cf;
+    border-radius: 50%;
+    background: transparent;
 }
 
 .image-backdrop {
-	position: absolute;
-	filter: blur(12px);
-	z-index: -5;
-	object-fit: contain;
-	pointer-events: none;
+    position: absolute;
+    filter: none;
+    z-index: -5;
+    object-fit: contain;
+    pointer-events: none;
+    opacity: 1;
+    box-shadow: 0 4px 32px 0 rgba(120, 180, 255, 0.10);
 }
 
 .offcanvas .card {
-	border: 1px solid #343434;
-	background-color: rgba(245, 233, 255, 0.05);
-	/* color: rgba(231, 231, 231, 1); */
-	margin-bottom: 0.5rem;
+    border: 1px solid #c3dafe;
+    background-color: rgba(245, 249, 255, 0.15);
+    margin-bottom: 0.5rem;
 }
 
 .offcanvas .card-interactable {
-	transition: 0.08s;
+    transition: 0.08s;
 }
 
 .offcanvas .card-interactable:hover {
-	cursor: pointer;
-	border: 1px solid #67666f;
-	background-color: rgba(0, 0, 0, 0.33);
+    cursor: pointer;
+    border: 1px solid #a8e6cf;
+    background-color: rgba(168, 230, 207, 0.18);
+}
+
+/* --- Enhanced Login & Create Account Page Styles --- */
+
+.form-floating .form-control, .form-floating .form-select {
+    border-radius: 12px;
+    border: 1.5px solid #b2f7ef;
+    background: rgba(255,255,255,0.95);
+    color: #232526;
+    font-size: 1.1rem;
+    box-shadow: 0 1px 8px 0 #b2f7ef22;
+    transition: border 0.2s, box-shadow 0.2s;
+}
+.form-floating .form-control:focus, .form-floating .form-select:focus {
+    border: 1.5px solid #7a83c5;
+    box-shadow: 0 0 8px 0 #7a83c5cc;
+    outline: none;
+}
+
+.btn-primary, .register-btn, .login-btn {
+    background: linear-gradient(90deg, #7a83c5 0%, #b2f7ef 100%);
+    color: #232526;
+    border: none;
+    border-radius: 12px;
+    font-weight: bold;
+    box-shadow: 0 2px 12px 0 #b2f7ef55;
+    letter-spacing: 0.04em;
+    font-family: 'IBM Plex Mono', 'Roboto', monospace;
+    transition: background 0.2s, box-shadow 0.2s, color 0.2s;
+}
+.btn-primary:hover, .register-btn:hover, .login-btn:hover {
+    background: linear-gradient(90deg, #ffd6e0 0%, #7a83c5 100%);
+    color: #232526;
+    box-shadow: 0 0 24px 0 #ffd6e055;
+}
+
+.btn-outline-primary {
+    border: 1.5px solid #7a83c5;
+    color: #7a83c5;
+    background: transparent;
+    border-radius: 12px;
+    font-weight: bold;
+    font-family: 'IBM Plex Mono', 'Roboto', monospace;
+    transition: background 0.2s, color 0.2s, border 0.2s;
+}
+.btn-outline-primary:hover {
+    background: #7a83c5;
+    color: #fff;
+    border: 1.5px solid #7a83c5;
+}
+
+.unavailable-btn {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.form-check-input:checked {
+    background-color: #7a83c5;
+    border-color: #7a83c5;
+}
+
+.form-check-input {
+    border-radius: 6px;
+    border: 1.5px solid #b2f7ef;
+}
+
+.invalid-feedback {
+    color: #ff4d6d;
+    font-size: 0.95em;
+    margin-top: 4px;
+}
+
+/* --- End Enhanced Login & Create Account Page Styles --- */
+
+.text-gradient-primary + p.text-muted {
+    font-family: 'Alte Haas Grotesk', 'IBM Plex Mono', 'Roboto', monospace;
+    font-weight: 600;
+    font-size: 1.25rem;
+    letter-spacing: 0.04em;
+    color: #7a83c5 !important;
+    text-shadow: 0 2px 8px #eaf3f6cc;
 }
