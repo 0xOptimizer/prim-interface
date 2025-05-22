@@ -44,7 +44,7 @@
                     <input type="password" id="login-password" class="form-control">
                     <label>Password</label>
                 </div>
-                <a href="#" class="unavailable-btn small d-block" style="margin-top: -20px; margin-bottom: 30px;">Forgot password?</a>
+                <a href="#" class="group-navigate-btn small d-block" data-group="forgot_password" style="margin-top: -20px; margin-bottom: 30px;">Forgot password?</a>
                 <div class="d-grid gap-2 mb-3">
                     <button class="login-btn btn btn-primary btn-lg" type="submit">Log In</button>
                 </div>
@@ -112,6 +112,28 @@
                 <!-- Submit Button -->
                 <div class="d-grid gap-2 mb-3">
                     <button class="register-btn btn btn-primary btn-lg" type="submit">Register</button>
+                </div>
+            </form>
+        </div>
+        <div class="group-container" data-group="forgot_password" style="display: none;">
+            <div class="mb-5">
+                <button class="group-navigate-btn btn btn-outline-primary btn-sm" type="button" data-group="main" style="width: 50px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+                    </svg>
+                </button>
+                <h4 class="text-center"><span class="text-gradient-primary">Forgot your password?</span></h4>
+            </div>
+            <form id="forgotPasswordForm" autocomplete="off">
+                <!-- Email -->
+                <div class="form-floating mb-3">
+                    <input type="email" class="form-control" id="forgot_password-email" name="forgot_password-email" autocomplete="new-email" required>
+                    <label for="forgot_password-email">Email address</label>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="d-grid gap-2 mb-3">
+                    <button class="forgot_password-btn btn btn-primary btn-lg" type="submit">Send Recovery Link</button>
                 </div>
             </form>
         </div>
@@ -280,6 +302,68 @@ $(document).ready(function() {
             $('#passwordError').hide();
             $('.register-btn').prop('disabled', false);
         }
+    });
+
+    $('.forgot_password-btn').on('click', function(e) {
+        e.preventDefault();
+        
+        const _this = this;
+
+        $(_this).attr('disabled', true);
+        $(_this).html('<i class="spinner-border spinner-border-sm"></i>');
+
+        const email = $('#forgot_password-email').val();
+
+        $.ajax({
+            url: 'https://prim-api.o513.dev/api/v1/recover/request',
+            type: 'POST',
+            data: JSON.stringify({
+                email: email 
+            }),
+            contentType: "application/json",
+            dataType: "json",
+            success: function (response, textStatus, xhr) {
+                if (xhr.status === 200) {
+                    let messageText = "Recovery link sent to your email!";
+                    let messageIcon = "success";
+                    sweetAlertStatusMessage(messageText, messageIcon);
+
+                    setTimeout(function () {
+                        window.location.href = window.location.origin + '/login';
+                    }, 1250);
+                } else {
+                    let messageText = response.message || 'An error occurred';
+                    let messageIcon = 'error';
+                    sweetAlertStatusMessage(messageText, messageIcon);
+                    $(_this).attr('disabled', false);
+                    $(_this).html('Send Recovery Link');
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                let messageText = 'Failed to connect to servers. Please try again!';
+                let messageIcon = 'warning';
+                
+                const response = jqXHR.responseJSON || {};
+                
+                if (jqXHR.status === 500) {
+                    messageText = 'Server error. Please try again later.';
+                } else if (jqXHR.status === 422 || jqXHR.status === 401) {
+                    messageText = response.message || 'Please check your input and try again';
+                    messageIcon = 'error';
+                }
+                
+                if (!messageText && response.message) {
+                    messageText = response.message;
+                }
+
+                sweetAlertStatusMessage(messageText, messageIcon);
+                
+                setTimeout(function() {
+                    $(_this).attr('disabled', false);
+                    $(_this).html('Send Recovery Link');
+                }, 750);
+            }
+        });
     });
 });
 </script>
