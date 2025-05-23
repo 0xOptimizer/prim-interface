@@ -14,7 +14,7 @@
         <div class="group-container" data-group="main">
             <div class="text-center mb-5">
                 <img src="{{ asset('images/prim-logo.png') }}" alt="Logo" class="logo img-fluid mx-auto d-block">
-                <h2 class="text-gradient-primary animate__animated animate__fadeInDown animate__durationExcluded" style="margin-top: -10px;">PRIM</h2>
+                <h2 class="text-gradient-primary-moving animate__animated animate__fadeInDown animate__durationExcluded" style="margin-top: -10px;">PRIM</h2>
                 <p class="text-muted fs-6 animate__animated animate__fadeIn animate__delay-1s animate__durationExcluded">Transform your learning experience<br>with voice-powered education</p>
             </div>
             <form>

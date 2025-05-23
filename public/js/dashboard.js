@@ -61,11 +61,11 @@ $(document).ready(function() {
     let isSpeechProcessing = false;
     
     $('.speech-recognition-btn').on('click', async function () {
-        if (isSpeechProcessing) {
-            return;
-        }
+        // if (isSpeechProcessing) {
+        //     return;
+        // }
 
-        isSpeechProcessing = true;
+        // isSpeechProcessing = true;
 
         const $this = $(this);
         const $status = $('.speech-recognition-status-text');
@@ -613,7 +613,7 @@ $(document).ready(function() {
                             <div class="card-body">
                                 <b class="card-title">${room.name}</b>
                                 <p class="card-text text-muted" style="font-size: 10px;">
-                                    ${isActive ? `<span class="text-success"><i class="spinner-grow" style="width: 8px; height: 8px;"></i> <b>ACTIVE</b></span> • TBD` : 'TBD'}
+                                    ${isActive ? `<span class="text-success"><i class="spinner-grow" style="width: 8px; height: 8px;"></i> <b>ACTIVE</b></span> • 2 hrs ago` : '2 hrs ago'}
                                 </p>
                             </div>
                             ${isActive ? `
@@ -636,6 +636,43 @@ $(document).ready(function() {
             }
         });
     }
+
+    function getFiles() {
+        const user_uuid = window.AppData.user_uuid;
+
+        $.ajax({
+            url: `https://prim-api.o513.dev/api/v1/files/user/${user_uuid}`,
+            type: 'GET',
+            success: function(response) {
+                console.log("Files fetched successfully:", response);
+                const $filesList = $('.files-list');
+                $filesList.empty();
+
+                if (response.length === 0) {
+                    // $filesList.append('<div class="alert alert-info">No files available.</div>');
+                    return;
+                }
+
+                response.forEach(file => {
+                    const fileItem = `
+                        <div class="file-card card card-warning-bg" data-file_id="${file.id}" data-file_name="${file.filename}">
+                            <div class="card-body">
+                                <b class="card-title">${file.filename}</b>
+                                <p class="card-text text-muted" style="font-size: 10px;">
+                                    <span><b>#453J</b></span> • 1.4 MB
+                                </p>
+                            </div>
+                        </div>`
+                    $filesList.append(fileItem);
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching files:", error);
+            }
+        });
+    }
+
+    getFiles();
 
     let is_room_open = false;
     $('.rooms-list').on('click', '.room-card', function() {
