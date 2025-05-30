@@ -5,6 +5,13 @@ $.ajaxSetup({
 });
 var current_room_code;
 var current_room_uuid;
+
+let activationPhrase = localStorage.getItem('activationPhrase') || 'okay';
+let difficultyLevel = localStorage.getItem('difficultyLevel') || 'beginner';
+let darkMode = localStorage.getItem('darkMode') === 'true';
+let notifications = localStorage.getItem('notifications') === 'true';
+let autoUpdates = localStorage.getItem('autoUpdates') === 'true';
+
 $(document).ready(function() {
     // $('body').on('click', '.group-navigate-btn', function() {
     //     const $this = $(this);
@@ -329,13 +336,14 @@ $(document).ready(function() {
         $('.speech-recognition-output-speech').attr('disabled', true);
         $('.speech-recognition-output-language').attr('disabled', true);
         $('.speech-recognition-output-language-btn').attr('disabled', true);
+        $('.speech-recognition-refresh-btn').attr('disabled', true);
         $('.speech-recognition-output-code').html('<div class="spinner-border text-primary" role="status"></div>');
 
         $.ajax({
             url: `https://prim-api.o513.dev/api/v1/ai/convert/request`,
             type: "POST",
             contentType: "application/json",
-            data: JSON.stringify({ speech: speech, language: language, room_code: current_room_code, user_uuid: window.AppData.user_uuid }),
+            data: JSON.stringify({ speech: speech, language: language, room_code: current_room_code, user_uuid: window.AppData.user_uuid, difficulty: difficultyLevel }),
             success: function (response) {
                 if (typeof response === "string") {
                     response = JSON.parse(response);
@@ -411,6 +419,7 @@ $(document).ready(function() {
                 $('.speech-recognition-output-speech').attr('disabled', false);
                 $('.speech-recognition-output-language').attr('disabled', false);
                 $('.speech-recognition-output-language-btn').attr('disabled', false);
+                $('.speech-recognition-refresh-btn').attr('disabled', false);
 
                 $('.speech-recognition-icon-mic').show();
                 $('.speech-recognition-icon-processing').hide();
@@ -429,6 +438,7 @@ $(document).ready(function() {
                 $('.speech-recognition-output-speech').attr('disabled', false);
                 $('.speech-recognition-output-language').attr('disabled', false);
                 $('.speech-recognition-output-language-btn').attr('disabled', false);
+                $('.speech-recognition-refresh-btn').attr('disabled', false);
 
                 $('.speech-recognition-icon-mic').show();
                 $('.speech-recognition-icon-processing').hide();
@@ -446,16 +456,28 @@ $(document).ready(function() {
         });
     }
 
-    let activationPhrase = localStorage.getItem('activationPhrase') || 'okay';
-
     function loadSettings() {
         $('#activationPhrase').val(activationPhrase);
+        $('#difficultyLevel').val(difficultyLevel);
+        $('#flexSwitchCheckDefault').prop('checked', darkMode);
+        $('#flexSwitchCheckNotifications').prop('checked', notifications);
+        $('#flexSwitchCheckAutoUpdates').prop('checked', autoUpdates);
     }
 
     function saveSettings() {
         activationPhrase = $('#activationPhrase').val().trim().toLowerCase();
+        difficultyLevel = $('#difficultyLevel').val();
+        darkMode = $('#flexSwitchCheckDefault').is(':checked');
+        notifications = $('#flexSwitchCheckNotifications').is(':checked');
+        autoUpdates = $('#flexSwitchCheckAutoUpdates').is(':checked');
+
         localStorage.setItem('activationPhrase', activationPhrase);
+        localStorage.setItem('difficultyLevel', difficultyLevel);
+        localStorage.setItem('darkMode', darkMode);
+        localStorage.setItem('notifications', notifications);
+        localStorage.setItem('autoUpdates', autoUpdates);
     }
+
 
     $('.save-settings-btn').on('click', function () {
         const $this = $(this);
@@ -518,6 +540,10 @@ $(document).ready(function() {
         convertPseudocode();
     });
 
+    $('.speech-recognition-refresh-btn').on('click', function() {
+        convertPseudocode();
+    });
+
     $('.speech-language-select-option').on('click', function() {
         const selectedLanguage = $(this).data('option');
         $('.speech-recognition-output-language').val(selectedLanguage);
@@ -529,7 +555,9 @@ $(document).ready(function() {
             $('.speech-language-icon').attr('src', '/images/javascript_logo.svg');
             $('.speech-language-text').text('JavaScript');
         }
-        convertPseudocode();
+        if ($('.speech-recognition-output-speech').val().trim() !== '') {
+            convertPseudocode();
+        }
     });
 
     $('#offcanvas-speech-output').on('hidden.bs.offcanvas', function () {

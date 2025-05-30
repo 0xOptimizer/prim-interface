@@ -3,13 +3,18 @@
         <h4 class="text-center mt-2"><span class="text-gradient-primary">My Settings</span></h4>
     </div>
     <div>
-        <!-- "activation phrase" input -->
-        <div class="form-group">
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" id="activationPhrase" placeholder="Activation Phrase" style="font-size: 1.08rem;">
             <label for="activationPhrase">Activation Phrase</label>
-            <input type="text" class="form-control p-3" id="activationPhrase" style="font-size: 20px; height: 48px;">
         </div>
-
-        <!-- switches -->
+        <div class="form-floating mb-3">
+            <select class="form-select" id="difficultyLevel" aria-label="Difficulty Level" style="font-size: 1.08rem;">
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="expert">Expert</option>
+            </select>
+            <label for="difficultyLevel">Difficulty Level</label>
+        </div>
         <hr class="my-4">
         <div class="d-flex flex-column gap-3">
             <div class="d-flex justify-content-between align-items-center">
